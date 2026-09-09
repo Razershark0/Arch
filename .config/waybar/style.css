@@ -1,0 +1,15 @@
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 13px;
+}
+window#waybar {
+    background-color: rgba(17, 9, 21, 0.60);
+    color: #c3c1c4;
+}
+#workspaces button.focused {
+    background-color: #A37E56;
+    color: #110915;
+}
+#urgent {
+    background-color: #63514C;
+}

@@ -1,0 +1,14 @@
+import = ["~/.config/alacritty/alacritty.toml"]
+
+[colors.primary]
+background = "#000000"
+
+[colors.normal]
+magenta = "#9b30ff"
+
+[colors.bright]
+magenta = "#b266ff"
+
+[window]
+startup_mode = "Fullscreen"
+decorations = "None"

@@ -1,0 +1,24 @@
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Flat-Remix-Purple-Dark";
+    display-drun: "Apps";
+    drun-display-format: "{name}";
+    location: 0;
+    yoffset: 0;
+    xoffset: 0;
+    width: 25%;
+    lines: 8;
+    font: "JetBrainsMono Nerd Font Mono 12";
+    matching: "fuzzy";
+    sort: true;
+    sorting-method: "fzf";
+}
+@theme "/usr/share/rofi/themes/Arc-Dark.rasi"
+@import "~/.config/rofi/colors-wal.rasi"
+inputbar {
+    children: [ prompt, textbox-prompt-colon, entry ];
+}
+scrollbar {
+    handle-rounded-corners: true;
+}
