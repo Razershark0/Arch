@@ -13,7 +13,9 @@ pipewire
 pipewire-pulse
 wireplumber
 brightnessctl
-ttf-jetbrains-mono-nerd
+ttf-jetbrains-mono
+ttf-nerd-fonts-symbols-mono
+ttf-nerd-fonts-symbols-common
 fzf
 unzip
 wget
@@ -27,3 +29,13 @@ grub
 tlp
 cryptsetup
 python-pipx
+calibre
+mpv
+cliphist
+slurp
+yazi
+chafa
+fd
+ripgrep
+ueberzugpp
+openvpn

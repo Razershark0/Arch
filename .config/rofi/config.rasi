@@ -9,7 +9,7 @@ configuration {
     xoffset: 0;
     width: 25%;
     lines: 8;
-    font: "JetBrainsMono Nerd Font Mono 12";
+    font: "JetBrains Mono 12";
     matching: "fuzzy";
     sort: true;
     sorting-method: "fzf";

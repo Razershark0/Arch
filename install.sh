@@ -19,6 +19,10 @@ echo "==> Installing unimatrix (matrix rain effect, via pipx)..."
 pipx ensurepath
 pipx install "git+https://github.com/will8211/unimatrix.git" || true
 
+echo "==> Enabling nerd-font icon glyph fallback (keeps ttf-jetbrains-mono small instead of using the 232MiB ttf-jetbrains-mono-nerd)..."
+sudo ln -sf /usr/share/fontconfig/conf.avail/10-nerd-font-symbols.conf /etc/fonts/conf.d/
+fc-cache -f
+
 echo "==> Symlinking config files..."
 mkdir -p "$HOME/.config" "$HOME/.local/bin"
 for dir in .config/*/; do
@@ -43,6 +47,22 @@ if ! grep -q "^HandleLidSwitch=suspend" /etc/systemd/logind.conf 2>/dev/null; th
     echo "HandleLidSwitch=suspend" | sudo tee -a /etc/systemd/logind.conf
     sudo systemctl restart systemd-logind
 fi
+
+echo "==> Setting timezone + enabling NTP sync..."
+sudo timedatectl set-timezone America/New_York
+sudo timedatectl set-ntp true
+
+echo "==> Shell prompt: username only, no host/path..."
+if ! grep -q "^PS1='\\\\u\\\\\$ '" "$HOME/.bashrc" 2>/dev/null; then
+    sed -i "s/^PS1=.*/PS1='\\\\u\\\\\$ '/" "$HOME/.bashrc"
+fi
+
+echo "==> Renaming Alacritty's launcher entry to 'Terminal' (user-level override, doesn't touch the system .desktop file)..."
+mkdir -p "$HOME/.local/share/applications"
+sed 's/^Name=Alacritty$/Name=Terminal/' /usr/share/applications/Alacritty.desktop > "$HOME/.local/share/applications/Alacritty.desktop"
+
+echo "==> Hiding Calibre's bundled LRF viewer from the app launcher (binary stays, just the launcher entry is removed)..."
+sudo rm -f /usr/share/applications/calibre-lrfviewer.desktop
 
 echo "==> Setting Hyprland to launch on tty1 login (no display manager, no autologin)..."
 if ! grep -q "exec Hyprland" "$HOME/.bash_profile" 2>/dev/null; then
