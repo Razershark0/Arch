@@ -116,185 +116,233 @@ defaults are already correct out of the box, no custom rules added).
 All of these live under `~/.config/` directly now (real files/folders, no
 longer symlinked from a git repo).
 
-### `~/.config/hypr/hyprland.conf`
-```
-$mod = SUPER
+### `~/.config/hypr/hyprland.lua`
+```lua
+-- Migrated from hyprland.conf (hyprlang syntax deprecated since 0.55,
+-- removed in 0.57). See https://wiki.hypr.land/Configuring/Start/
 
-# Colors ported from the Kali i3 rice's wal vars
-# wal-bg #110915  wal-fg #c3c1c4  wal-orange #A37E56  wal-urgent #63514C
-general {
-    gaps_in = 8
-    gaps_out = 8
-    border_size = 2
-    col.active_border = rgb(A37E56)
-    col.inactive_border = rgb(110915)
-    layout = dwindle
-}
+local mod = "SUPER"
 
-decoration {
-    rounding = 12
-    active_opacity = 1.0
-    inactive_opacity = 1.0
-    blur {
-        enabled = false
-    }
-}
+------------------
+---- MONITORS ----
+------------------
 
-# Plain numeric workspaces (1-10), each given a persistent display name via
-# defaultName -- NOT `name:` workspaces. Named ("name:xxx") workspaces get
-# arbitrary negative internal IDs assigned in creation order, which breaks
-# the slide-animation direction (it compares actual IDs): switching "1"->"2"
-# could slide backwards if "2" happened to get a more-negative ID than "1".
-# Plain numeric IDs keep proper ascending order so the animation direction
-# always matches the visible number.
-workspace = 1, defaultName:WEB
-workspace = 2, defaultName:TERM
-workspace = 3, defaultName:CODE
-workspace = 4, defaultName:NET
-workspace = 5, defaultName:TOOLS
-workspace = 6, defaultName:FILES
-workspace = 7, defaultName:NOTES
-workspace = 8, defaultName:CHAT
-workspace = 9, defaultName:MEDIA
-workspace = 10, defaultName:MON
+hl.monitor({
+    output   = "",
+    mode     = "preferred",
+    position = "auto",
+    scale    = "auto",
+})
 
-# Note: i3-gaps' "inner" gap applies to screen edges too (only "outer" is
-# purely additive on top), so i3's inner:10/outer:0 still shows a 10px edge
-# gap around a lone window. Hyprland's gaps_in/gaps_out split the same idea
-# differently: gaps_in is ONLY between adjacent windows and never touches
-# the screen edge, gaps_out is what controls edge spacing -- so matching
-# the i3 config's literal outer:0 value here would show no edge gap at all.
-# gaps_out (above, in general{}) is what actually reproduces the i3 rice's
-# visual result. i3's "smart_gaps on" (zeroes outer for one window) has no
-# Hyprland equivalent needed here since we're not aiming to remove that
-# edge gap for single windows in the first place.
+-----------------------
+---- LOOK AND FEEL ----
+-----------------------
 
-input {
-    follow_mouse = 1
-}
+-- Colors ported from the Kali i3 rice's wal vars
+-- wal-bg #110915  wal-fg #c3c1c4  wal-orange #A37E56  wal-urgent #63514C
+hl.config({
+    general = {
+        gaps_in     = 8,
+        gaps_out    = 8,
+        border_size = 2,
 
-# dwindle already auto-splits by window aspect ratio, same effect as the
-# i3 config's `exec_always autotiling`
-dwindle {
-    preserve_split = true
-}
+        col = {
+            active_border   = "rgb(A37E56)",
+            inactive_border = "rgb(110915)",
+        },
 
-exec-once = hyprpaper
-exec-once = waybar
-exec-once = dunst
-exec-once = hypridle
-exec-once = nm-applet
-exec-once = wl-paste --watch cliphist store
+        layout = "dwindle",
+    },
 
-# Matrix idle window's own startup_mode = "Fullscreen" in matrix-idle.toml
-# requests real fullscreen directly from the client -- no Hyprland-side
-# window rule needed (and windowrulev2 is deprecated in this build anyway).
+    decoration = {
+        rounding         = 12,
+        active_opacity   = 1.0,
+        inactive_opacity = 1.0,
 
-# Workspaces — plain numeric IDs (see defaultName rules above for the
-# exact i3-matching "N: LABEL" display names/symbols)
-bind = $mod, 1, workspace, 1
-bind = $mod, 2, workspace, 2
-bind = $mod, 3, workspace, 3
-bind = $mod, 4, workspace, 4
-bind = $mod, 5, workspace, 5
-bind = $mod, 6, workspace, 6
-bind = $mod, 7, workspace, 7
-bind = $mod, 8, workspace, 8
-bind = $mod, 9, workspace, 9
-bind = $mod, 0, workspace, 10
+        blur = {
+            enabled = false,
+        },
+    },
 
-bind = $mod SHIFT, 1, movetoworkspace, 1
-bind = $mod SHIFT, 2, movetoworkspace, 2
-bind = $mod SHIFT, 3, movetoworkspace, 3
-bind = $mod SHIFT, 4, movetoworkspace, 4
-bind = $mod SHIFT, 5, movetoworkspace, 5
-bind = $mod SHIFT, 6, movetoworkspace, 6
-bind = $mod SHIFT, 7, movetoworkspace, 7
-bind = $mod SHIFT, 8, movetoworkspace, 8
-bind = $mod SHIFT, 9, movetoworkspace, 9
-bind = $mod SHIFT, 0, movetoworkspace, 10
+    -- Splash text/logo disabled (also set via hyprpaper.conf's `splash = false`,
+    -- which is where the joke quote actually gets drawn from)
+    misc = {
+        disable_hyprland_logo    = true,
+        disable_splash_rendering = true,
+    },
+})
 
-# Launch / windows
-bind = $mod, RETURN, exec, alacritty
-bind = $mod, Q, killactive
-bind = $mod, D, exec, rofi -show drun
-bind = $mod, F, fullscreen
-bind = $mod SHIFT, SPACE, togglefloating
-bind = $mod, SPACE, togglefloating, active
-# i3's `layout stacking/tabbed/toggle split` -> closest Hyprland analogue is grouping
-bind = $mod, S, togglegroup
-bind = $mod, W, lockactivegroup, toggle
-bind = $mod, E, changegroupactive
+-- Plain numeric workspaces (1-10), each given a persistent display name via
+-- default_name -- NOT named ("name:xxx") workspaces. Named workspaces get
+-- arbitrary negative internal IDs assigned in creation order, which breaks
+-- the slide-animation direction (it compares actual IDs): switching "1"->"2"
+-- could slide backwards if "2" happened to get a more-negative ID than "1".
+-- Plain numeric IDs keep proper ascending order so the animation direction
+-- always matches the visible number.
+hl.workspace_rule({ workspace = "1",  default_name = "WEB" })
+hl.workspace_rule({ workspace = "2",  default_name = "TERM" })
+hl.workspace_rule({ workspace = "3",  default_name = "CODE" })
+hl.workspace_rule({ workspace = "4",  default_name = "NET" })
+hl.workspace_rule({ workspace = "5",  default_name = "TOOLS" })
+hl.workspace_rule({ workspace = "6",  default_name = "FILES" })
+hl.workspace_rule({ workspace = "7",  default_name = "NOTES" })
+hl.workspace_rule({ workspace = "8",  default_name = "CHAT" })
+hl.workspace_rule({ workspace = "9",  default_name = "MEDIA" })
+hl.workspace_rule({ workspace = "10", default_name = "MON" })
 
-# Focus (i3's unusual j=left k=down l=up ;=right mapping, kept as-is)
-bind = $mod, J, movefocus, l
-bind = $mod, K, movefocus, d
-bind = $mod, L, movefocus, u
-bind = $mod, semicolon, movefocus, r
-bind = $mod, Left, movefocus, l
-bind = $mod, Down, movefocus, d
-bind = $mod, Up, movefocus, u
-bind = $mod, Right, movefocus, r
+-- Note: i3-gaps' "inner" gap applies to screen edges too (only "outer" is
+-- purely additive on top), so i3's inner:10/outer:0 still shows a 10px edge
+-- gap around a lone window. Hyprland's gaps_in/gaps_out split the same idea
+-- differently: gaps_in is ONLY between adjacent windows and never touches
+-- the screen edge, gaps_out is what controls edge spacing -- so matching
+-- the i3 config's literal outer:0 value here would show no edge gap at all.
+-- gaps_out = 8 (above, in general) is what actually reproduces the i3
+-- rice's visual result. i3's "smart_gaps on" (zeroes outer for one window)
+-- has no Hyprland equivalent needed here since we're not aiming to remove
+-- that edge gap for single windows in the first place.
 
-# Move focused window
-bind = $mod SHIFT, J, movewindow, l
-bind = $mod SHIFT, K, movewindow, d
-bind = $mod SHIFT, L, movewindow, u
-bind = $mod SHIFT, semicolon, movewindow, r
-bind = $mod SHIFT, Left, movewindow, l
-bind = $mod SHIFT, Down, movewindow, d
-bind = $mod SHIFT, Up, movewindow, u
-bind = $mod SHIFT, Right, movewindow, r
+hl.config({
+    input = {
+        follow_mouse = 1,
+    },
+})
 
-# Reload / exit (Hyprland has no i3-style "restart in place"; SHIFT+R just re-sources the config)
-bind = $mod SHIFT, C, exec, hyprctl reload
-bind = $mod SHIFT, E, exit
+-- dwindle already auto-splits by window aspect ratio, same effect as the
+-- i3 config's `exec_always autotiling`
+hl.config({
+    dwindle = {
+        preserve_split = true,
+    },
+})
 
-# Resize mode (i3's `mode "resize"`)
-bind = $mod, R, submap, resize
-submap = resize
-binde = , left, resizeactive, -10 0
-binde = , down, resizeactive, 0 10
-binde = , up, resizeactive, 0 -10
-binde = , right, resizeactive, 10 0
-bind = , return, submap, reset
-bind = , escape, submap, reset
-bind = $mod, R, submap, reset
-submap = reset
+-------------------
+---- AUTOSTART ----
+-------------------
 
-# Matrix idle screensaver
-bind = $mod SHIFT, M, exec, ~/.local/bin/matrix-idle.sh
+hl.on("hyprland.start", function()
+    hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("dunst")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("nm-applet")
+    hl.exec_cmd("blueman-applet")
+    hl.exec_cmd("copyq")
+end)
 
-# Volume/mic/brightness OSD, backed by osd.sh
-bindel = , XF86AudioRaiseVolume, exec, ~/.local/bin/osd.sh volume-up
-bindel = , XF86AudioLowerVolume, exec, ~/.local/bin/osd.sh volume-down
-bindel = , XF86AudioMute, exec, ~/.local/bin/osd.sh volume-mute
-bindel = , XF86AudioMicMute, exec, ~/.local/bin/osd.sh mic-mute
-bindel = , XF86MonBrightnessUp, exec, ~/.local/bin/osd.sh brightness-up
-bindel = , XF86MonBrightnessDown, exec, ~/.local/bin/osd.sh brightness-down
+-- Matrix idle window's own startup_mode = "Fullscreen" in matrix-idle.toml
+-- requests real fullscreen directly from the client -- no Hyprland-side
+-- window rule needed (and windowrulev2 is deprecated in this build anyway).
 
-# Screenshots (maim+xclip -> grim+slurp+wl-clipboard), same keys as i3
-bind = , Print, exec, grim -g "$(slurp)" - | wl-copy -t image/png
-bind = $mod, Print, exec, grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+---------------------
+---- KEYBINDINGS ----
+---------------------
 
-# Clipboard history (copyq -> cliphist), same key as i3's $mod+p
-bind = $mod, P, exec, cliphist list | rofi -dmenu -no-show-icons -display-columns 2 -display-column-separator "\t" -p "Clipboard" | cliphist decode | wl-copy
+-- Workspaces — plain numeric IDs (see default_name rules above for the
+-- exact i3-matching "N: LABEL" display names/symbols)
+hl.bind(mod .. " + 1", hl.dsp.focus({ workspace = 1 }))
+hl.bind(mod .. " + 2", hl.dsp.focus({ workspace = 2 }))
+hl.bind(mod .. " + 3", hl.dsp.focus({ workspace = 3 }))
+hl.bind(mod .. " + 4", hl.dsp.focus({ workspace = 4 }))
+hl.bind(mod .. " + 5", hl.dsp.focus({ workspace = 5 }))
+hl.bind(mod .. " + 6", hl.dsp.focus({ workspace = 6 }))
+hl.bind(mod .. " + 7", hl.dsp.focus({ workspace = 7 }))
+hl.bind(mod .. " + 8", hl.dsp.focus({ workspace = 8 }))
+hl.bind(mod .. " + 9", hl.dsp.focus({ workspace = 9 }))
+hl.bind(mod .. " + 0", hl.dsp.focus({ workspace = 10 }))
 
-# Scratchpad -> Hyprland's special workspace
-bind = $mod SHIFT, minus, movetoworkspace, special
-bind = $mod, minus, togglespecialworkspace
+hl.bind(mod .. " + SHIFT + 1", hl.dsp.window.move({ workspace = 1 }))
+hl.bind(mod .. " + SHIFT + 2", hl.dsp.window.move({ workspace = 2 }))
+hl.bind(mod .. " + SHIFT + 3", hl.dsp.window.move({ workspace = 3 }))
+hl.bind(mod .. " + SHIFT + 4", hl.dsp.window.move({ workspace = 4 }))
+hl.bind(mod .. " + SHIFT + 5", hl.dsp.window.move({ workspace = 5 }))
+hl.bind(mod .. " + SHIFT + 6", hl.dsp.window.move({ workspace = 6 }))
+hl.bind(mod .. " + SHIFT + 7", hl.dsp.window.move({ workspace = 7 }))
+hl.bind(mod .. " + SHIFT + 8", hl.dsp.window.move({ workspace = 8 }))
+hl.bind(mod .. " + SHIFT + 9", hl.dsp.window.move({ workspace = 9 }))
+hl.bind(mod .. " + SHIFT + 0", hl.dsp.window.move({ workspace = 10 }))
 
-cursor {
-    inactive_timeout = 3
-}
+-- Launch / windows
+hl.bind(mod .. " + RETURN",       hl.dsp.exec_cmd("alacritty"))
+hl.bind(mod .. " + Q",            hl.dsp.window.close())
+hl.bind(mod .. " + D",            hl.dsp.exec_cmd("rofi -show drun"))
+hl.bind(mod .. " + F",            hl.dsp.window.fullscreen({}))
+hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.float({}))
+hl.bind(mod .. " + SPACE",        hl.dsp.window.float({}))
+-- i3's `layout stacking/tabbed/toggle split` -> closest Hyprland analogue is grouping
+hl.bind(mod .. " + S", hl.dsp.group.toggle())
+hl.bind(mod .. " + W", hl.dsp.group.lock_active({ action = "toggle" }))
+hl.bind(mod .. " + E", hl.dsp.group.next())
 
-# i3 has no window-open/close animations at all, and the default "pop in
-# from small" one is what made the matrix screensaver look like it was
-# growing out of a small terminal. Disabled globally to match i3 -- the
-# workspace slide animation (not asked about) is left as-is.
-animations {
-    animation = windows, 0
-}
+-- Focus (i3's unusual j=left k=down l=up ;=right mapping, kept as-is)
+hl.bind(mod .. " + J",         hl.dsp.focus({ direction = "l" }))
+hl.bind(mod .. " + K",         hl.dsp.focus({ direction = "d" }))
+hl.bind(mod .. " + L",         hl.dsp.focus({ direction = "u" }))
+hl.bind(mod .. " + semicolon", hl.dsp.focus({ direction = "r" }))
+hl.bind(mod .. " + Left",      hl.dsp.focus({ direction = "l" }))
+hl.bind(mod .. " + Down",      hl.dsp.focus({ direction = "d" }))
+hl.bind(mod .. " + Up",        hl.dsp.focus({ direction = "u" }))
+hl.bind(mod .. " + Right",     hl.dsp.focus({ direction = "r" }))
+
+-- Move focused window
+hl.bind(mod .. " + SHIFT + J",         hl.dsp.window.move({ direction = "l" }))
+hl.bind(mod .. " + SHIFT + K",         hl.dsp.window.move({ direction = "d" }))
+hl.bind(mod .. " + SHIFT + L",         hl.dsp.window.move({ direction = "u" }))
+hl.bind(mod .. " + SHIFT + semicolon", hl.dsp.window.move({ direction = "r" }))
+hl.bind(mod .. " + SHIFT + Left",      hl.dsp.window.move({ direction = "l" }))
+hl.bind(mod .. " + SHIFT + Down",      hl.dsp.window.move({ direction = "d" }))
+hl.bind(mod .. " + SHIFT + Up",        hl.dsp.window.move({ direction = "u" }))
+hl.bind(mod .. " + SHIFT + Right",     hl.dsp.window.move({ direction = "r" }))
+
+-- Reload / exit (Hyprland has no i3-style "restart in place"; SHIFT+C just re-sources the config)
+hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl reload"))
+hl.bind(mod .. " + SHIFT + E", hl.dsp.exit())
+
+-- Resize mode (i3's `mode "resize"`)
+hl.bind(mod .. " + R", hl.dsp.submap("resize"))
+hl.define_submap("resize", function()
+    hl.bind("left",  hl.dsp.window.resize({ x = -10, y = 0,   relative = true }), { repeating = true })
+    hl.bind("down",  hl.dsp.window.resize({ x = 0,   y = 10,  relative = true }), { repeating = true })
+    hl.bind("up",    hl.dsp.window.resize({ x = 0,   y = -10, relative = true }), { repeating = true })
+    hl.bind("right", hl.dsp.window.resize({ x = 10,  y = 0,   relative = true }), { repeating = true })
+    hl.bind("return", hl.dsp.submap("reset"))
+    hl.bind("escape", hl.dsp.submap("reset"))
+    hl.bind(mod .. " + R", hl.dsp.submap("reset"))
+end)
+
+-- Matrix idle screensaver
+hl.bind(mod .. " + SHIFT + M", hl.dsp.exec_cmd("~/.local/bin/matrix-idle.sh"))
+
+-- Volume/mic/brightness OSD, backed by osd.sh
+hl.bind("XF86AudioRaiseVolume",   hl.dsp.exec_cmd("~/.local/bin/osd.sh volume-up"),       { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume",   hl.dsp.exec_cmd("~/.local/bin/osd.sh volume-down"),     { locked = true, repeating = true })
+hl.bind("XF86AudioMute",          hl.dsp.exec_cmd("~/.local/bin/osd.sh volume-mute"),     { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute",       hl.dsp.exec_cmd("~/.local/bin/osd.sh mic-mute"),        { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp",    hl.dsp.exec_cmd("~/.local/bin/osd.sh brightness-up"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown",  hl.dsp.exec_cmd("~/.local/bin/osd.sh brightness-down"), { locked = true, repeating = true })
+
+-- Screenshots (maim+xclip -> grim+slurp+wl-clipboard), same keys as i3
+hl.bind("Print",       hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy -t image/png'))
+hl.bind(mod .. " + Print", hl.dsp.exec_cmd('grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png'))
+
+-- Clipboard history (same tool as the i3 rice: CopyQ, native GUI with image
+-- thumbnails -- no cliphist/rofi scripting needed)
+hl.bind(mod .. " + P", hl.dsp.exec_cmd("copyq show"))
+
+-- Scratchpad -> Hyprland's named special workspace
+hl.bind(mod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special:scratchpad" }))
+hl.bind(mod .. " + minus",         hl.dsp.workspace.toggle_special("scratchpad"))
+
+hl.config({
+    cursor = {
+        inactive_timeout = 3,
+    },
+})
+
+-- i3 has no window-open/close animations at all, and the default "pop in
+-- from small" one is what made the matrix screensaver look like it was
+-- growing out of a small terminal. Disabled globally to match i3 -- the
+-- workspace slide animation (not asked about) is left as-is.
+hl.animation({ leaf = "windows", enabled = false })
 ```
 
 ### `~/.config/hypr/hypridle.conf`
