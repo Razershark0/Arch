@@ -1,24 +1,102 @@
+/*
+ * Structure adapted from adi1090x's widely-used rofi theme collection
+ * (github.com/adi1090x/rofi, vendored by traits-arch/configs) -- the
+ * card-style icon grid layout -- rebuilt in this machine's own wal-derived
+ * colors instead of that theme's light palette, replacing the generic
+ * Arc-Dark inheritance the old config leaned on.
+ */
 configuration {
     modi: "drun,run,window";
     show-icons: true;
     icon-theme: "Adwaita";
     display-drun: "Apps";
     drun-display-format: "{name}";
-    location: 0;
-    yoffset: 0;
-    xoffset: 0;
-    width: 25%;
-    lines: 8;
-    font: "JetBrains Mono 12";
+    font: "JetBrains Mono 11";
     matching: "fuzzy";
     sort: true;
     sorting-method: "fzf";
 }
-@theme "/usr/share/rofi/themes/Arc-Dark.rasi"
+
 @import "~/.config/rofi/colors-wal.rasi"
-inputbar {
-    children: [ prompt, textbox-prompt-colon, entry ];
+
+* {
+    background-color: transparent;
+    text-color: @wal-foreground;
 }
-scrollbar {
-    handle-rounded-corners: true;
+
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+    width: 500px;
+    border: 2px;
+    border-color: @wal-accent;
+    border-radius: 16px;
+    background-color: @wal-background;
+}
+
+mainbox {
+    padding: 20px;
+    spacing: 16px;
+    children: [ "inputbar", "listview" ];
+}
+
+inputbar {
+    padding: 10px 14px;
+    spacing: 10px;
+    border-radius: 12px;
+    background-color: #1d1420;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    text-color: @wal-accent;
+}
+
+entry {
+    placeholder: "Search…";
+    placeholder-color: #6f6a72;
+}
+
+listview {
+    columns: 4;
+    lines: 2;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+    spacing: 10px;
+    fixed-height: true;
+    fixed-columns: true;
+}
+
+element {
+    padding: 10px 6px;
+    spacing: 8px;
+    orientation: vertical;
+    border-radius: 12px;
+}
+
+element-icon {
+    size: 40px;
+    horizontal-align: 0.5;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: inherit;
+}
+
+element selected {
+    background-color: @wal-accent;
+    text-color: @wal-background;
+}
+element selected element-text {
+    text-color: @wal-background;
+}
+
+error-message {
+    padding: 16px;
+    border-radius: 12px;
+    background-color: @wal-background;
 }
