@@ -1,0 +1,122 @@
+{
+    "layer": "top",
+    "height": 48,
+    "margin-top": 0,
+    "margin-bottom": 0,
+    "margin-left": 0,
+    "margin-right": 0,
+    "spacing": 0,
+    "modules-left": [
+        "custom/appmenu",
+        "hyprland/workspaces"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "group/status"
+    ],
+    "group/status": {
+        "orientation": "inherit",
+        "modules": [
+            "network",
+            "bluetooth",
+            "battery",
+            "group/cpudrawer",
+            "custom/exit"
+        ]
+    },
+    "hyprland/workspaces": {
+        "on-scroll-up": "hyprctl dispatch workspace r-1",
+        "on-scroll-down": "hyprctl dispatch workspace r+1",
+        "on-click": "activate",
+        "active-only": false,
+        "all-outputs": true,
+        "format": "{}",
+        "format-icons": {
+            "urgent": "",
+            "active": "",
+            "default": ""
+        }
+    },
+    "custom/appmenu": {
+        "format": "",
+        "on-click": "sleep 0.2;rofi -show drun -replace",
+        "tooltip-format": "Open the application launcher"
+    },
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%Y-%m-%d}",
+        "tooltip": false
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}%",
+        "format-charging": "{capacity}%",
+        "format-plugged": "{capacity}%",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+"bluetooth": {
+        "format": "",
+        "format-disabled": "",
+        "format-off": "",
+        "interval": 30,
+        "on-click": "blueman-manager",
+        "format-no-controller": ""
+    },
+    "network": {
+        "format": "{ifname}",
+        "format-wifi": "",
+        "format-ethernet": "  {ifname}",
+        "format-disconnected": "Disconnected",
+        "tooltip-format": " {ifname} via {gwaddri}",
+        "tooltip-format-wifi": "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits} Down: {bandwidthDownBits}",
+        "tooltip-format-ethernet": " {ifname}\nIP: {ipaddr}\n up: {bandwidthUpBits} down: {bandwidthDownBits}",
+        "tooltip-format-disconnected": "Disconnected",
+        "max-length": 50,
+        "on-click": "alacritty --class dotfiles-floating -e nmtui"
+    },
+    "group/cpudrawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "cpu-drawer-child",
+            "transition-left-to-right": false
+        },
+        "modules": [
+            "custom/monitor",
+            "cpu",
+            "temperature",
+            "memory"
+        ]
+    },
+    "custom/monitor": {
+        "format": "󰍹",
+        "tooltip": false,
+        "on-click": "alacritty --class dotfiles-floating -e btop"
+    },
+    "cpu": {
+        "format": "<span font_weight='heavy'></span> {usage}%",
+        "tooltip": false
+    },
+"memory": {
+        "format": "<span font_weight='heavy'></span> {percentage}%"
+    },
+    "temperature": {
+        "format": "<span font_weight='heavy'></span> {temperatureC}°C"
+    },
+    "custom/exit": {
+        "format": "",
+        "on-click": "wlogout",
+        "tooltip-format": "Power Menu"
+    }
+}

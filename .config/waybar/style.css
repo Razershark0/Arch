@@ -1,110 +1,192 @@
-/* Structural base adapted from elifouts/Dotfiles -- colors hardcoded to this
- * machine's wal-derived palette (same values as hyprland.lua / hyprlock.conf)
- * instead of a pywal @import, since pywal isn't part of this setup. */
-@define-color bg #110915;
-@define-color fg #c3c1c4;
-@define-color accent #A37E56;
-@define-color urgent #63514C;
+/* Sizing/structure and Catppuccin Mocha palette borrowed from
+ * prasanthrangan/hyprdots (8.4k stars) waybar theme - floating pills
+ * on a transparent bar, compact sizing, subtle bounce on hover/active. */
+
+@define-color bar-bg rgba(0, 0, 0, 0);
+@define-color main-bg #11111b;
+@define-color main-fg #cdd6f4;
+@define-color accent-bg #a6adc8;
+@define-color accent-fg #313244;
+@define-color hover-bg #f5c2e7;
+@define-color hover-fg #313244;
+@define-color critical #f38ba8;
 
 * {
-    /* "JetBrainsMono Nerd Font" isn't an installed font name on this machine --
-     * the real names are "JetBrains Mono" (text) and "Symbols Nerd Font Mono"
-     * (icon glyphs only, from ttf-nerd-fonts-symbols-mono). Listing both lets
-     * Pango fall through to the icon font for glyphs JetBrains Mono lacks,
-     * instead of silently rendering nothing. */
-    font-family: "JetBrains Mono", "Symbols Nerd Font Mono", sans-serif;
-    font-size: 13px;
+    font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 7 Free", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 0px;
     min-height: 0;
 }
 
+button {
+    min-height: 0px;
+    min-width: 0px;
+}
+
+/* Icon-bearing modules need the Solid weight to actually pick up the
+ * Font Awesome 7 Free OTF (Regular-400 doesn't carry these glyphs).
+ * Bluetooth's glyph only exists in the separate Brands font. */
+#custom-appmenu, #network, #custom-exit {
+    font-family: "Font Awesome 7 Free";
+    font-weight: 900;
+}
+
+#battery {
+    font-family: "Font Awesome 7 Free", "JetBrainsMono Nerd Font Mono";
+    font-size: 16px;
+}
+
+#bluetooth {
+    font-family: "Font Awesome 7 Brands";
+    font-weight: 400;
+}
+
 window#waybar {
-    background: transparent;
+    background: @bar-bg;
 }
-
-.modules-left, .modules-center, .modules-right {
-    background: alpha(@bg, 0.75);
-    border-radius: 10px;
-    margin: 6px 0 0 0;
-    padding: 0 8px;
-}
-
-.modules-left { margin-left: 8px; }
-.modules-right { margin-right: 8px; }
 
 tooltip {
-    background: @bg;
-    border: 1px solid @accent;
-    border-radius: 8px;
+    background: @main-bg;
+    color: @main-fg;
+    border-radius: 10px;
+    padding: 10px;
 }
+
 tooltip label {
-    color: @fg;
+    color: @main-fg;
 }
 
-/* Block-highlight workspaces, same idea as Skilledcamman/.DarkSide's
- * #workspaces button.active { background: ... } -- a filled rounded block
- * behind the active workspace instead of just tinting the number. */
-#workspaces button {
-    all: unset;
-    padding: 0 6px;
-    margin: 3px 2px;
-    border-radius: 8px;
-    color: alpha(@fg, 0.5);
-    transition: all .2s ease;
-}
-#workspaces button.active {
-    background: @accent;
-    color: @bg;
-    padding: 0 10px;
-}
-#workspaces button:hover {
-    background: alpha(@accent, 0.25);
-    color: @fg;
-}
+/* Shared pill look for every standalone module/group */
 
+#custom-appmenu,
+#workspaces,
 #clock,
-#tray,
-#pulseaudio,
-#network,
-#bluetooth,
-#battery,
-#custom-power,
-#custom-usage-toggle,
-#cpu,
-#memory,
-#disk {
-    padding: 0 8px;
-    color: @fg;
+#status {
+    background: @main-bg;
+    color: @main-fg;
+    border-radius: 8px;
+    margin: 4px 0px;
+    padding: 2px 18px;
 }
 
-#custom-usage-toggle:hover,
-#cpu,
-#memory,
-#disk {
-    color: alpha(@fg, 0.8);
+.modules-left > widget:first-child > #custom-appmenu {
+    margin-left: 8px;
 }
 
-#battery.warning:not(.charging) {
-    color: @accent;
+.modules-right > widget:last-child > #status {
+    margin-right: 8px;
 }
+
+/* App menu (search) */
+
+#custom-appmenu {
+    margin-right: 8px;
+}
+
+/* Workspaces */
+
+#workspaces {
+    margin-right: 8px;
+    padding: 3px 3px;
+}
+
+#workspaces button {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0px;
+    margin: 3px 3px;
+    border-radius: 8px;
+    color: @main-fg;
+    background: rgba(205, 214, 244, 0.15);
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#workspaces button.active {
+    background: @accent-bg;
+    color: @accent-fg;
+    opacity: 1;
+    padding: 0px;
+    transition: all 0.4s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#workspaces button:hover {
+    background: @hover-bg;
+    color: @hover-fg;
+    opacity: 1;
+}
+
+/* Clock */
+
+#clock {
+    font-weight: 700;
+}
+
+/* Status pill: network, bluetooth, battery, cpu, power share one pill */
+
+#network, #bluetooth, #battery, #custom-monitor, #cpu, #temperature, #memory, #custom-exit {
+    color: @main-fg;
+    margin: 0px 9px 0px 0px;
+}
+
+#bluetooth {
+    font-size: 18px;
+}
+
+#custom-monitor {
+    font-size: 22px;
+}
+
+#cpu {
+    font-family: "Font Awesome 7 Free", "JetBrainsMono Nerd Font Mono";
+}
+
+#memory, #temperature {
+    font-family: "Font Awesome 7 Free", "JetBrainsMono Nerd Font Mono";
+    color: @main-fg;
+    margin: 0px 9px 0px 0px;
+}
+
+#custom-exit {
+    margin-right: 0px;
+}
+
+#custom-exit:hover {
+    color: @hover-bg;
+}
+
+#battery.warning {
+    color: #f9e2af;
+}
+
 #battery.critical:not(.charging) {
-    color: @urgent;
-    animation: blink 1s linear infinite alternate;
-}
-@keyframes blink {
-    to { opacity: 0.4; }
+    color: @critical;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
 
-#custom-power {
-    color: @urgent;
+@keyframes blink {
+    to {
+        color: @main-fg;
+    }
 }
-#custom-power:hover {
-    color: @accent;
+
+/* Tray */
+
+#tray {
+    padding: 0px 15px 0px 0px;
+    color: @main-fg;
 }
 
 #tray > .passive {
     -gtk-icon-effect: dim;
 }
+
 #tray > .needs-attention {
     -gtk-icon-effect: highlight;
-    color: @urgent;
 }
