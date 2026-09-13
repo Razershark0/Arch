@@ -90,11 +90,12 @@ deleted quickshell lock app's file watch — dead on removal). It's currently
 using a bare functional config (`~/.config/hypr/hyprlock.conf`), not yet
 themed to match the rest of the setup.
 
-Waybar, rofi(-wayland), dunst, hyprpolkitagent, xdg-desktop-portal-hyprland,
-blueman, and wlogout are being added as the direct replacement for the pill
-— check this file's git history / the live configs for whether that
-rebuild has landed yet, since this note was written right at the start of
-that work.
+Waybar, rofi, dunst, hyprpolkitagent, xdg-desktop-portal-hyprland, blueman,
+and wlogout were all added same-day as the direct replacement for the pill.
+`rofi` (not `rofi-wayland` — that fork was merged upstream as of rofi 2.0,
+which is what's in the official repos now) is the launcher (`mod+D`),
+`wlogout` is the power menu (`mod+O`). See section 4 below for the actual
+configs.
 
 ### Font setup (not just a package install)
 We deliberately do NOT use `ttf-jetbrains-mono-nerd` (232 MiB — huge because
@@ -627,65 +628,206 @@ decorations = "None"
 ```
 
 ### `~/.config/waybar/config`
-Key structural changes from the stock waybar example config (which
-defaults to Sway module names and doesn't work under Hyprland at all):
-- `"layer": "top"`, `"position": "top"` (was commented out)
-- `modules-left`: `["hyprland/workspaces", "hyprland/submap", "custom/media"]`
-  (was `sway/workspaces`, `sway/mode`, `sway/scratchpad`)
-- `modules-center`: `["hyprland/window"]` (was `sway/window`)
-- `modules-right`: unchanged from stock except `sway/language` was left in
-  (harmless — auto-disables under Hyprland) and `mpd`/`battery#bat2`/
-  `custom/power` are dead/non-functional (see "known gaps")
-- `"hyprland/workspaces"` config block:
-```json
-"hyprland/workspaces": {
-    "format": "{icon} {name}",
-    "format-icons": {
-        "active:WEB": "", "WEB": "",
-        "active:TERM": "", "TERM": "",
-        "active:CODE": "", "CODE": "",
-        "active:NET": "", "NET": "",
-        "active:TOOLS": "", "TOOLS": "",
-        "active:FILES": "", "FILES": "",
-        "active:NOTES": "", "NOTES": "",
-        "active:CHAT": "", "CHAT": "",
-        "active:MEDIA": "", "MEDIA": "",
-        "active:MON": "", "MON": ""
+**Rebuilt 2026-09-12** replacing the quickshell pill. Structural base adapted
+from elifouts/Dotfiles (github.com/elifouts/Dotfiles), trimmed to this
+machine's actual tools and re-colored to the existing wal palette instead of
+importing someone else's theme.
+```jsonc
+// -*- mode: jsonc -*-
+// Structural base adapted from elifouts/Dotfiles (github.com/elifouts/Dotfiles,
+// MIT-style personal dotfiles repo) -- trimmed to this machine's actual tools
+// (tlp not power-profiles-daemon, blueman not a generic tray rename, dunst not
+// swaync, wlogout for the power menu) and this machine's color scheme.
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "reload_style_on_change": true,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["tray", "pulseaudio", "network", "bluetooth", "battery", "custom/power"],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-click": "activate",
+        "persistent-workspaces": {
+            "*": [1, 2, 3, 4, 5]
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 50,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%H:%M   %a %d %b}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "on-click": "copyq show"
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-muted": " muted",
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    },
+
+    "network": {
+        "format-wifi": "{signalStrength}% ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "format-disconnected": "disconnected ⚠",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)",
+        "on-click": "alacritty -e nmtui"
+    },
+
+    "bluetooth": {
+        "format-on": "",
+        "format-off": "off",
+        "format-disabled": "disabled",
+        "format-connected": "{num_connections} ",
+        "tooltip-format": "{controller_alias}\t{controller_address}",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "on-click": "blueman-manager"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-icons": ["", "", "", "", ""]
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": false,
+        "on-click": "wlogout"
     }
-},
-"hyprland/submap": {
-    "format": "<span style=\"italic\">{}</span>"
-},
+}
 ```
-These exact icon codepoints were reverse-engineered from the real i3 rice's
-`$ws1.."$ws10` strings (they're invisible on a plain text read — confirmed
-via Python `repr()` on the raw file bytes). IMPORTANT: waybar's icon lookup
-checks `active:<name>` BEFORE plain `<name>` — you need BOTH keys per
-workspace or the icon won't show while that workspace is focused.
 
 ### `~/.config/waybar/style.css`
-Two changes from stock:
 ```css
+/* Structural base adapted from elifouts/Dotfiles -- colors hardcoded to this
+ * machine's wal-derived palette (same values as hyprland.lua / hyprlock.conf)
+ * instead of a pywal @import, since pywal isn't part of this setup. */
+@define-color bg #110915;
+@define-color fg #c3c1c4;
+@define-color accent #A37E56;
+@define-color urgent #63514C;
+
 * {
-    font-family: "JetBrains Mono", sans-serif;   /* was FontAwesome (not installed) */
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", sans-serif;
     font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+.modules-left, .modules-center, .modules-right {
+    background: alpha(@bg, 0.75);
+    border-radius: 10px;
+    margin: 6px 0 0 0;
+    padding: 0 8px;
+}
+
+.modules-left { margin-left: 8px; }
+.modules-right { margin-right: 8px; }
+
+tooltip {
+    background: @bg;
+    border: 1px solid @accent;
+    border-radius: 8px;
+}
+tooltip label {
+    color: @fg;
+}
+
+#workspaces button {
+    all: unset;
+    padding: 0 6px;
+    color: alpha(@fg, 0.4);
+    transition: color .2s ease;
+}
+#workspaces button.active {
+    color: @accent;
+}
+#workspaces button:hover {
+    color: @fg;
+}
+
+#window,
+#clock,
+#tray,
+#pulseaudio,
+#network,
+#bluetooth,
+#battery,
+#custom-power {
+    padding: 0 8px;
+    color: @fg;
+}
+
+#window {
+    color: alpha(@fg, 0.7);
+}
+
+#battery.warning:not(.charging) {
+    color: @accent;
+}
+#battery.critical:not(.charging) {
+    color: @urgent;
+    animation: blink 1s linear infinite alternate;
+}
+@keyframes blink {
+    to { opacity: 0.4; }
+}
+
+#custom-power {
+    color: @urgent;
+}
+#custom-power:hover {
+    color: @accent;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    color: @urgent;
 }
 ```
-```css
-#workspaces button.focused, #workspaces button.active {
-    background-color: #A37E56; /* wal-orange, matches the window border color */
-    box-shadow: inset 0 -3px #A37E56;
-}
-```
-(was `background-color: #64727D; box-shadow: inset 0 -3px #ffffff;`)
-Everything else in style.css is untouched stock waybar defaults.
 
 ### `~/.config/rofi/config.rasi`
+Only change from the prior (never-actually-installed) version: `icon-theme`
+now points at `Adwaita` (actually installed) instead of the missing
+`Flat-Remix-Purple-Dark`.
 ```
 configuration {
     modi: "drun,run,window";
     show-icons: true;
-    icon-theme: "Flat-Remix-Purple-Dark";
+    icon-theme: "Adwaita";
     display-drun: "Apps";
     drun-display-format: "{name}";
     location: 0;
@@ -709,6 +851,8 @@ scrollbar {
 ```
 
 ### `~/.config/rofi/colors-wal.rasi`
+Unchanged, was already correct (hardcoded wal-derived palette, no pywal
+dependency).
 ```
 /* generated by hardcoded wal-colors script — do not edit by hand */
 * {
@@ -731,31 +875,620 @@ element selected {
     text-color: @wal-background;
 }
 ```
-Note: `icon-theme: "Flat-Remix-Purple-Dark"` isn't installed — rofi falls
-back gracefully, just cosmetic (see "known gaps").
 
 ### `~/.config/dunst/dunstrc`
-Base file is 100% stock dunst default config EXCEPT these specific lines
-(diff against `/etc/dunst/dunstrc`):
+Was already fully written and correctly themed (colors, corner radii, font)
+from the earlier i3-migration work, just never had the `dunst` package
+actually installed until 2026-09-12. Only change made: `icon_theme` now
+points at `Adwaita` instead of the missing `Flat-Remix-Purple-Dark`. Full
+current file:
 ```
-progress_bar_corner_radius = 8      (was 0)
-icon_corner_radius = 8              (was 0)
-frame_color = "#A37E56"             (was "#aaaaaa")
-font = JetBrains Mono 11            (was "Monospace 8")
-icon_theme = "Flat-Remix-Purple-Dark"  (was Adwaita — not installed, falls back)
-min_icon_size = 24                  (was 32)
-max_icon_size = 48                  (was 128)
-corner_radius = 10                  (was 0)
+# See dunst(5) for all configuration options
 
-# [urgency_low]
-background = "#110915"  foreground = "#c3c1c4"  timeout = 3
-# [urgency_normal]
-background = "#110915"  foreground = "#c3c1c4"  timeout = 3
-# [urgency_critical]
-background = "#110915"  foreground = "#c3c1c4"  frame_color = "#63514C"
+[global]
+    ### Display ###
+
+    # Which monitor should the notifications be displayed on.
+    monitor = 0
+
+    # Display notification on focused monitor.  Possible modes are:
+    #   mouse: follow mouse pointer
+    #   keyboard: follow window with keyboard focus
+    #   none: don't follow anything
+    #
+    # "keyboard" needs a window manager that exports the
+    # _NET_ACTIVE_WINDOW property.
+    # This should be the case for almost all modern window managers.
+    #
+    # If this option is set to mouse or keyboard, the monitor option
+    # will be ignored.
+    follow = none
+
+    ### Geometry ###
+
+    # The width of the window, excluding the frame.
+    # dynamic width from 0 to 300
+    # width = (0, 300)
+    # constant width of 300
+    width = 300
+
+    # The height of a single notification, excluding the frame.
+    # dynamic height from 0 to 300
+    height = (0, 300)
+    # constant height of 300
+    # height = 300
+    # NOTE: Dunst from version 1.11 and older don't support dynamic height
+    #       and the given value is treated as the maximum height
+
+    # Position the notification in the top right corner
+    origin = top-right
+
+    # Offset from the origin
+    # NOTE: Dunst from version 1.11 and older use this alternative notation
+    # offset = 10x50
+    offset = (10, 50)
+
+    # Scale factor. It is auto-detected if value is 0.
+    scale = 0
+
+    # Maximum number of notification (0 means no limit)
+    notification_limit = 20
+
+    ### Progress bar ###
+
+    # Turn on the progress bar. It appears when a progress hint is passed with
+    # for example dunstify -h int:value:12
+    progress_bar = true
+
+    # Set the progress bar height. This includes the frame, so make sure
+    # it's at least twice as big as the frame width.
+    progress_bar_height = 10
+
+    # Set the frame width of the progress bar
+    progress_bar_frame_width = 1
+
+    # Set the minimum width for the progress bar
+    progress_bar_min_width = 150
+
+    # Set the maximum width for the progress bar
+    progress_bar_max_width = 300
+
+    # Corner radius for the progress bar. 0 disables rounded corners.
+    progress_bar_corner_radius = 8
+
+    # Define which corners to round when drawing the progress bar. If progress_bar_corner_radius
+    # is set to 0 this option will be ignored.
+    progress_bar_corners = all
+
+    # Corner radius for the icon image.
+    icon_corner_radius = 8
+
+    # Define which corners to round when drawing the icon image. If icon_corner_radius
+    # is set to 0 this option will be ignored.
+    icon_corners = all
+
+    # Show how many messages are currently hidden (because of
+    # notification_limit).
+    indicate_hidden = yes
+
+    # The transparency of the window.  Range: [0; 100].
+    # This option will only work if a compositing window manager is
+    # present (e.g. xcompmgr, compiz, etc.). (X11 only)
+    transparency = 0
+
+    # Draw a line of "separator_height" pixel height between two
+    # notifications.
+    # Set to 0 to disable.
+    # If gap_size is greater than 0, this setting will be ignored.
+    separator_height = 2
+
+    # Padding between text and separator.
+    padding = 8
+
+    # Horizontal padding.
+    horizontal_padding = 8
+
+    # Padding between text and icon.
+    text_icon_padding = 0
+
+    # Defines width in pixels of frame around the notification window.
+    # Set to 0 to disable.
+    frame_width = 3
+
+    # Defines color of the frame around the notification window.
+    frame_color = "#A37E56"
+
+    # Size of gap to display between notifications - requires a compositor.
+    # If value is greater than 0, separator_height will be ignored and a border
+    # of size frame_width will be drawn around each notification instead.
+    # Click events on gaps do not currently propagate to applications below.
+    gap_size = 0
+
+    # Define a color for the separator.
+    # possible values are:
+    #  * auto: dunst tries to find a color fitting to the background;
+    #  * foreground: use the same color as the foreground;
+    #  * frame: use the same color as the frame;
+    #  * anything else will be interpreted as a X color.
+    separator_color = frame
+
+    # Sort type.
+    # possible values are:
+    #  * id: sort by id
+    #  * urgency_ascending: sort by urgency (low then normal then critical)
+    #  * urgency_descending: sort by urgency (critical then normal then low)
+    #  * update: sort by update (most recent always at the top)
+    sort = yes
+
+    # Don't remove messages, if the user is idle (no mouse or keyboard input)
+    # for longer than idle_threshold seconds.
+    # Set to 0 to disable.
+    # A client can set the 'transient' hint to bypass this. See the rules
+    # section for how to disable this if necessary
+    # idle_threshold = 120
+
+    ### Text ###
+
+    font = JetBrains Mono 11
+
+    # The spacing between lines.  If the height is smaller than the
+    # font height, it will get raised to the font height.
+    line_height = 0
+
+    # Possible values are:
+    # full: Allow a small subset of html markup in notifications:
+    #        <b>bold</b>
+    #        <i>italic</i>
+    #        <s>strikethrough</s>
+    #        <u>underline</u>
+    #
+    #        For a complete reference see
+    #        <https://docs.gtk.org/Pango/pango_markup.html>.
+    #
+    # strip: This setting is provided for compatibility with some broken
+    #        clients that send markup even though it's not enabled on the
+    #        server. Dunst will try to strip the markup but the parsing is
+    #        simplistic so using this option outside of matching rules for
+    #        specific applications *IS GREATLY DISCOURAGED*.
+    #
+    # no:    Disable markup parsing, incoming notifications will be treated as
+    #        plain text. Dunst will not advertise that it has the body-markup
+    #        capability if this is set as a global setting.
+    #
+    # It's important to note that markup inside the format option will be parsed
+    # regardless of what this is set to.
+    markup = full
+
+    # The format of the message.  Possible variables are:
+    #   %a  appname
+    #   %s  summary
+    #   %b  body
+    #   %c  category
+    #   %S  stack_tag
+    #   %i  iconname (including its path)
+    #   %I  iconname (without its path)
+    #   %p  progress value if set ([  0%] to [100%]) or nothing
+    #   %n  progress value if set without any extra characters
+    #   %%  literal %
+    # Markup is allowed
+    format = "<b>%s</b>\n%b"
+
+    # Alignment of message text.
+    # Possible values are "left", "center" and "right".
+    alignment = left
+
+    # Vertical alignment of message text and icon.
+    # Possible values are "top", "center" and "bottom".
+    vertical_alignment = center
+
+    # Show age of message if message is older than show_age_threshold
+    # seconds.
+    # Set to -1 to disable.
+    show_age_threshold = 60
+
+    # Specify where to make an ellipsis in long lines.
+    # Possible values are "start", "middle" and "end".
+    ellipsize = middle
+
+    # Ignore newlines '\n' in notifications.
+    ignore_newline = no
+
+    # Stack together notifications with the same content
+    stack_duplicates = true
+
+    # Hide the count of stacked notifications with the same content
+    hide_duplicate_count = false
+
+    # Display indicators for URLs (U) and actions (A).
+    show_indicators = yes
+
+    # When set to true (recommended), you can use POSIX regular expressions for filtering rules.
+    # If this is set to false (not recommended), dunst will use fnmatch(3) for matching strings.
+    # Dunst doesn't pass any flags to fnmatch, so you cannot make use of extended patterns.
+    #
+    # Note that this will eventually be true by default.
+    enable_posix_regex = false
+
+    ### Icons ###
+
+    # Recursive icon lookup. You can set a single theme, instead of having to
+    # define all lookup paths.
+    enable_recursive_icon_lookup = true
+
+    # Set icon theme (only used for recursive icon lookup)
+    icon_theme = "Adwaita"
+    # You can also set multiple icon themes, with the leftmost one being used first.
+    # icon_theme = "Adwaita, breeze"
+
+    # Align icons left/right/top/off
+    icon_position = left
+
+    # Scale small icons up to this size, set to 0 to disable. Helpful
+    # for e.g. small files or high-dpi screens. In case of conflict,
+    # max_icon_size takes precedence over this.
+    min_icon_size = 24
+
+    # Scale larger icons down to this size, set to 0 to disable
+    max_icon_size = 48
+
+    # Paths to default icons (only necessary when not using recursive icon lookup)
+    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+
+    ### History ###
+
+    # Should a notification popped up from history be sticky or timeout
+    # as if it would normally do.
+    sticky_history = yes
+
+    # Maximum amount of notifications kept in history
+    history_length = 20
+
+    ### Misc/Advanced ###
+
+    # dmenu path.
+    dmenu = /usr/bin/dmenu -p dunst:
+
+    # Browser for opening urls in context menu.
+    browser = /usr/bin/xdg-open
+
+    # Always run rule-defined scripts, even if the notification is suppressed
+    always_run_script = true
+
+    # Define the title of the windows spawned by dunst (X11 only)
+    title = Dunst
+
+    # Define the class of the windows spawned by dunst (X11 only)
+    class = Dunst
+
+    # Define the corner radius of the notification window
+    # in pixel size. If the radius is 0, you have no rounded
+    # corners.
+    # The radius will be automatically lowered if it exceeds half of the
+    # notification height to avoid clipping text and/or icons.
+    corner_radius = 10
+
+    # Define which corners to round when drawing the window. If the corner radius
+    # is set to 0 this option will be ignored.
+    #
+    # Comma-separated list of the corners. The accepted corner values are bottom-right,
+    # bottom-left, top-right, top-left, top, bottom, left, right or all.
+    corners = all
+
+    # Ignore the dbus closeNotification message.
+    # Useful to enforce the timeout set by dunst configuration. Without this
+    # parameter, an application may close the notification sent before the
+    # user defined timeout.
+    ignore_dbusclose = false
+
+    ### Wayland ###
+    # These settings are Wayland-specific. They have no effect when using X11
+
+    # Uncomment this if you want to let notifications appear under fullscreen
+    # applications (default: overlay)
+    # layer = top
+
+    # Set this to true to use X11 output on Wayland.
+    force_xwayland = false
+
+    ### Legacy
+
+    # Use the Xinerama extension instead of RandR for multi-monitor support.
+    # This setting is provided for compatibility with older nVidia drivers that
+    # do not support RandR and using it on systems that support RandR is highly
+    # discouraged.
+    #
+    # By enabling this setting dunst will not be able to detect when a monitor
+    # is connected or disconnected which might break follow mode if the screen
+    # layout changes.
+    force_xinerama = false
+
+    ### mouse
+
+    # Defines list of actions for each mouse event
+    # Possible values are:
+    # * none: Don't do anything.
+    # * do_action: Invoke the action determined by the action_name rule. If there is no
+    #              such action, open the context menu.
+    # * open_url: If the notification has exactly one url, open it. If there are multiple
+    #             ones, open the context menu.
+    # * close_current: Close current notification.
+    # * remove_current: Remove current notification from history.
+    # * close_all: Close all notifications.
+    # * context: Open context menu for the notification.
+    # * context_all: Open context menu for all notifications.
+    # These values can be strung together for each mouse event, and
+    # will be executed in sequence.
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+# Experimental features that may or may not work correctly. Do not expect them
+# to have a consistent behaviour across releases.
+[experimental]
+    # Calculate the dpi to use on a per-monitor basis.
+    # If this setting is enabled the Xft.dpi value will be ignored and instead
+    # dunst will attempt to calculate an appropriate dpi value for each monitor
+    # using the resolution and physical size. This might be useful in setups
+    # where there are multiple screens with very different dpi values.
+    per_monitor_dpi = false
+
+    # Pause notification timeout when mouse hovers over the notification window.
+    # When enabled, notifications won't timeout while the mouse pointer is over
+    # them. The timeout resumes when the pointer leaves the window.
+    # Only works on Wayland.
+    pause_on_mouse_over = false
+
+    # Use PCRE regular expressions for filtering rules.
+    # This setting overrides enable_posix_regex.
+    enable_pcre_regex = false
+
+[urgency_low]
+    # IMPORTANT: colors have to be defined in quotation marks.
+    # Otherwise the "#" and following would be interpreted as a comment.
+    background = "#110915"
+    foreground = "#c3c1c4"
+    timeout = 3
+    # Icon for notifications with low urgency
+    default_icon = dialog-information
+
+[urgency_normal]
+    background = "#110915"
+    foreground = "#c3c1c4"
+    timeout = 3
+    override_pause_level = 30
+    # Icon for notifications with normal urgency
+    default_icon = dialog-information
+
+[urgency_critical]
+    background = "#110915"
+    foreground = "#c3c1c4"
+    frame_color = "#63514C"
+    timeout = 0
+    override_pause_level = 60
+    # Icon for notifications with critical urgency
+    default_icon = dialog-warning
+
+# Every section that isn't one of the above is interpreted as a rules to
+# override settings for certain messages.
+#
+# Messages can be matched by
+#    appname (discouraged, see desktop_entry)
+#    body
+#    category
+#    desktop_entry
+#    icon
+#    match_transient
+#    msg_urgency
+#    stack_tag
+#    summary
+#
+# and you can override the
+#    background
+#    foreground
+#    format
+#    frame_color
+#    fullscreen
+#    new_icon
+#    set_stack_tag
+#    set_transient
+#    set_category
+#    timeout
+#    urgency
+#    icon_position
+#    skip_display
+#    history_ignore
+#    action_name
+#    word_wrap
+#    ellipsize
+#    alignment
+#    hide_text
+#    override_pause_level
+#
+# Shell-like globbing will get expanded.
+#
+# Instead of the appname filter, it's recommended to use the desktop_entry filter.
+# GLib based applications export their desktop-entry name. In comparison to the appname,
+# the desktop-entry won't get localized.
+#
+# You can also allow a notification to appear even when paused. Notification will appear whenever notification's override_pause_level >= dunst's paused level.
+# This can be used to set partial pause modes, where more urgent notifications get through, but less urgent stay paused. To do that, you can override the following in the rules:
+# override_pause_level = X
+
+# SCRIPTING
+# You can specify a script that gets run when the rule matches by
+# setting the "script" option.
+# The script will be called as follows:
+#   script appname summary body icon urgency
+# where urgency can be "LOW", "NORMAL" or "CRITICAL".
+#
+# NOTE: It might be helpful to run dunst -print in a terminal in order
+# to find fitting options for rules.
+
+# Disable the transient hint so that idle_threshold cannot be bypassed from the
+# client
+#[transient_disable]
+#    match_transient = yes
+#    set_transient = no
+#
+# Make the handling of transient notifications more strict by making them not
+# be placed in history.
+#[transient_history_ignore]
+#    match_transient = yes
+#    history_ignore = yes
+
+# fullscreen values
+# show: show the notifications, regardless if there is a fullscreen window opened
+# delay: displays the new notification, if there is no fullscreen window active
+#        If the notification is already drawn, it won't get undrawn.
+# pushback: same as delay, but when switching into fullscreen, the notification will get
+#           withdrawn from screen again and will get delayed like a new notification
+# suppress: withdraw the displayed notification when entering fullscreen and never show
+#           the new notifications that arrive during fullscreen mode
+#[fullscreen_delay_everything]
+#    fullscreen = delay
+#[fullscreen_show_critical]
+#    msg_urgency = critical
+#    fullscreen = show
+
+#[espeak]
+#    summary = "*"
+#    script = dunst_espeak.sh
+
+#[script-test]
+#    summary = "*script*"
+#    script = dunst_test.sh
+
+#[ignore]
+#    # This notification will not be displayed
+#    summary = "foobar"
+#    skip_display = true
+
+#[history-ignore]
+#    # This notification will not be saved in history
+#    summary = "foobar"
+#    history_ignore = yes
+
+#[skip-display]
+#    # This notification will not be displayed, but will be included in the history
+#    summary = "foobar"
+#    skip_display = yes
+
+#[signed_on]
+#    appname = Pidgin
+#    summary = "*signed on*"
+#    urgency = low
+#
+#[signed_off]
+#    appname = Pidgin
+#    summary = *signed off*
+#    urgency = low
+#
+#[says]
+#    appname = Pidgin
+#    summary = *says*
+#    urgency = critical
+#
+#[twitter]
+#    appname = Pidgin
+#    summary = *twitter.com*
+#    urgency = normal
+#
+#[stack-volumes]
+#    appname = "some_volume_notifiers"
+#    set_stack_tag = "volume"
+#
 ```
-Easiest to regenerate: copy `/etc/dunst/dunstrc` then apply the 8 line
-changes above by hand (it's a huge file, not worth pasting in full here).
+
+### `~/.config/wlogout/layout` and `style.css`
+New 2026-09-12, replacing the pill's power menu. Layout is stock wlogout
+defaults except the `lock` action, which calls `pidof hyprlock || hyprlock`
+directly rather than `loginctl lock-session` (that only marks the logind
+session locked -- it does NOT itself invoke hyprlock, so the button would
+otherwise appear to do nothing).
+```json
+{
+    "label" : "lock",
+    "action" : "pidof hyprlock || hyprlock",
+    "text" : "Lock",
+    "keybind" : "l"
+}
+{
+    "label" : "hibernate",
+    "action" : "systemctl hibernate",
+    "text" : "Hibernate",
+    "keybind" : "h"
+}
+{
+    "label" : "logout",
+    "action" : "loginctl terminate-user $USER",
+    "text" : "Logout",
+    "keybind" : "e"
+}
+{
+    "label" : "shutdown",
+    "action" : "systemctl poweroff",
+    "text" : "Shutdown",
+    "keybind" : "s"
+}
+{
+    "label" : "suspend",
+    "action" : "systemctl suspend",
+    "text" : "Suspend",
+    "keybind" : "u"
+}
+{
+    "label" : "reboot",
+    "action" : "systemctl reboot",
+    "text" : "Reboot",
+    "keybind" : "r"
+}
+```
+```css
+* {
+    background-image: none;
+    box-shadow: none;
+}
+
+window {
+    background-color: alpha(#110915, 0.85);
+}
+
+button {
+    color: #c3c1c4;
+    background-color: #110915;
+    border: 2px solid #A37E56;
+    border-radius: 12px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    margin: 10px;
+    transition: all 0.2s ease;
+}
+
+button:focus, button:active, button:hover {
+    background-color: #A37E56;
+    outline-style: none;
+}
+
+#lock {
+    background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+}
+#logout {
+    background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+}
+#suspend {
+    background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+}
+#hibernate {
+    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"));
+}
+#shutdown {
+    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+}
+#reboot {
+    background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+}
+```
 
 ### `~/.bashrc`
 Only change: `PS1='[\u@\h \W]\$ '` → `PS1='\u\$ '`
@@ -771,11 +1504,12 @@ directly by `hyprpaper.conf`.
 - **File manager**: none installed. Landed on `yazi` (not `nnn` — user had
   heard `nnn`'s UX is rough, and confirmed `yazi` on its own merits: async/fast,
   built-in image preview, sensible defaults). Needs `ueberzugpp` too (see below).
-- **`Flat-Remix-Purple-Dark` icon theme**: referenced by both dunstrc and
-  rofi config.rasi, not installed. Falls back to default icons, cosmetic
-  gap only, never fixed.
-- **`copyq`**: deliberately dropped, replaced by `cliphist` (Wayland-native,
-  lighter). Same keybind (`$mod+P`) repurposed for it.
+- ~~`Flat-Remix-Purple-Dark` icon theme~~ — fixed 2026-09-12: dunstrc and
+  rofi config.rasi both now point at `Adwaita` (actually installed) instead.
+- **`copyq`**: kept, deliberately, as of the 2026-09-12 cleanup — the user
+  was asked cliphist vs CopyQ directly and chose to keep CopyQ. (This
+  contradicts older i3-migration-era notes that said the opposite; this
+  line is the current, correct answer.)
 - **VPN**: only `openvpn` installed (client). No `.ovpn` config file
   provided yet — nothing to connect to until the user has one.
 - **VS Code / GUI code editor**: discussed, not yet installed. Only

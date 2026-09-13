@@ -1,2 +1,3 @@
 waterfox-bin
+wlogout
 yay

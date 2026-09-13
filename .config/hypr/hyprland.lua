@@ -99,12 +99,17 @@ hl.config({
 
 hl.on("hyprland.start", function()
     hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("dunst")
     hl.exec_cmd("nm-applet")
+    hl.exec_cmd("blueman-applet")
     hl.exec_cmd("copyq --start-server")
-    -- hyprsunset.service is enabled but only starts under graphical-session.target,
-    -- which nothing in this session reaches -- start the unit directly instead of
-    -- the target so hypridle (also gated on that target) stays untouched.
+    -- hyprsunset.service and hyprpolkitagent.service are both enabled but only
+    -- start under graphical-session.target, which nothing in this session
+    -- reaches -- start both units directly instead of the target so hypridle
+    -- (also gated on that target) stays untouched.
     hl.exec_cmd("systemctl --user start hyprsunset")
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
 end)
 
 -- Matrix idle window's own startup_mode = "Fullscreen" in matrix-idle.toml
@@ -155,8 +160,9 @@ hl.bind(mod .. " + SHIFT + 0", hl.dsp.window.move({ workspace = 10 }))
 -- Launch / windows
 hl.bind(mod .. " + RETURN",       hl.dsp.exec_cmd("alacritty"))
 hl.bind(mod .. " + Q",            hl.dsp.window.close())
--- mod+D: launcher -- quickshell removed, rofi not wired up yet (next phase)
--- hl.bind(mod .. " + D", hl.dsp.exec_cmd("rofi -show drun"))
+hl.bind(mod .. " + D", hl.dsp.exec_cmd("rofi -show drun"))
+-- Power menu (lock/logout/suspend/hibernate/shutdown/reboot)
+hl.bind(mod .. " + O", hl.dsp.exec_cmd("wlogout"))
 hl.bind(mod .. " + F",            hl.dsp.window.fullscreen({}))
 hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.float({}))
 hl.bind(mod .. " + SPACE",        hl.dsp.window.float({}))

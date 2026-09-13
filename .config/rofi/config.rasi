@@ -1,7 +1,7 @@
 configuration {
     modi: "drun,run,window";
     show-icons: true;
-    icon-theme: "Flat-Remix-Purple-Dark";
+    icon-theme: "Adwaita";
     display-drun: "Apps";
     drun-display-format: "{name}";
     location: 0;

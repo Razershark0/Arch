@@ -1,6 +1,7 @@
 alacritty
 base
 base-devel
+blueman
 bluez
 bluez-utils
 brightnessctl
@@ -10,6 +11,7 @@ chafa
 cifs-utils
 copyq
 cryptsetup
+dunst
 efibootmgr
 fd
 fzf
@@ -20,8 +22,10 @@ hypridle
 hyprland
 hyprlock
 hyprpaper
+hyprpolkitagent
 hyprsunset
 jq
+libnotify
 linux
 linux-firmware
 mpv
@@ -31,11 +35,13 @@ networkmanager
 network-manager-applet
 openssh
 openvpn
+otf-font-awesome
 pipewire
 pipewire-pulse
 python
 python-pipx
 ripgrep
+rofi
 slurp
 smbclient
 sudo
@@ -49,9 +55,12 @@ ufw
 unzip
 upower
 waterfox-bin
+waybar
 wget
 wireplumber
 wl-clipboard
+wlogout
+xdg-desktop-portal-hyprland
 yay
 yazi
 zathura
