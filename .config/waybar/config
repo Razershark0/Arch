@@ -1,8 +1,19 @@
 // -*- mode: jsonc -*-
-// Structural base adapted from elifouts/Dotfiles (github.com/elifouts/Dotfiles,
-// MIT-style personal dotfiles repo) -- trimmed to this machine's actual tools
-// (tlp not power-profiles-daemon, blueman not a generic tray rename, dunst not
-// swaync, wlogout for the power menu) and this machine's color scheme.
+// Structural base adapted from elifouts/Dotfiles (github.com/elifouts/Dotfiles)
+// for the click-to-reveal usage drawer, and Skilledcamman/.DarkSide
+// (github.com/Skilledcamman/.DarkSide) for the workspace block-highlight
+// idea -- both re-colored to this machine's palette. Layout follows what
+// the old quickshell pill had: workspaces left, wifi/bluetooth/usage/
+// battery/power right.
+//
+// Icons are written as \uXXXX JSON escapes, not literal glyph characters --
+// literal Nerd Font private-use glyphs typed directly into this file didn't
+// survive being written to disk (came out as nothing at all, confirmed by
+// inspecting the raw bytes), so every icon here is spelled out by its exact
+// codepoint instead, which is just plain ASCII until waybar's JSON parser
+// converts it. Codepoints are standard Font Awesome (the nf-fa-* set),
+// all confirmed present in the installed Symbols Nerd Font Mono via
+// `fc-query --format '%{charset}'` (covers f000-f385, which holds all of these).
 {
     "layer": "top",
     "position": "top",
@@ -12,11 +23,13 @@
 
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["tray", "pulseaudio", "network", "bluetooth", "battery", "custom/power"],
+    "modules-right": ["network", "bluetooth", "group/usage", "pulseaudio", "battery", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{id}",
         "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace -1",
+        "on-scroll-down": "hyprctl dispatch workspace +1",
         "persistent-workspaces": {
             "*": [1, 2, 3, 4, 5]
         }
@@ -35,10 +48,10 @@
 
     "pulseaudio": {
         "format": "{volume}% {icon}",
-        "format-muted": " muted",
+        "format-muted": " muted",
         "format-icons": {
-            "headphone": "",
-            "default": ["", "", ""]
+            "headphone": "",
+            "default": ["", "", ""]
         },
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
@@ -46,22 +59,55 @@
     },
 
     "network": {
-        "format-wifi": "{signalStrength}% ",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "format-disconnected": "disconnected ⚠",
+        "format-wifi": "{signalStrength}% ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "format-disconnected": "disconnected ",
         "tooltip-format-wifi": "{essid} ({signalStrength}%)",
         "on-click": "rofi-wifi-menu.sh"
     },
 
     "bluetooth": {
-        "format-on": "",
+        "format-on": "",
         "format-off": "off",
         "format-disabled": "disabled",
-        "format-connected": "{num_connections} ",
+        "format-connected": "{num_connections} ",
         "tooltip-format": "{controller_alias}\t{controller_address}",
         "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
         "tooltip-format-enumerate-connected": "{device_alias}",
         "on-click": "rofi-bluetooth"
+    },
+
+    // Click-to-reveal cpu/ram/storage, same idea as the pill's sysmon surface:
+    // one icon sits in the bar, clicking it slides out the three stats.
+    "group/usage": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 400,
+            "transition-to-left": true,
+            "click-to-reveal": true
+        },
+        "modules": ["custom/usage-toggle", "cpu", "memory", "disk"]
+    },
+
+    "custom/usage-toggle": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "tooltip": false
+    },
+
+    "memory": {
+        "format": " {percentage}%",
+        "tooltip-format": "{used:0.1f}GB / {total:0.1f}GB used"
+    },
+
+    "disk": {
+        "format": " {percentage_used}%",
+        "path": "/",
+        "tooltip-format": "{used} used of {total}"
     },
 
     "battery": {
@@ -70,13 +116,13 @@
             "critical": 15
         },
         "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% ",
-        "format-plugged": "{capacity}% ",
-        "format-icons": ["", "", "", "", ""]
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-icons": ["", "", "", "", ""]
     },
 
     "custom/power": {
-        "format": "⏻",
+        "format": "",
         "tooltip": false,
         "on-click": "wlogout"
     }

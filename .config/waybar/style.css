@@ -7,7 +7,12 @@
 @define-color urgent #63514C;
 
 * {
-    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", sans-serif;
+    /* "JetBrainsMono Nerd Font" isn't an installed font name on this machine --
+     * the real names are "JetBrains Mono" (text) and "Symbols Nerd Font Mono"
+     * (icon glyphs only, from ttf-nerd-fonts-symbols-mono). Listing both lets
+     * Pango fall through to the icon font for glyphs JetBrains Mono lacks,
+     * instead of silently rendering nothing. */
+    font-family: "JetBrains Mono", "Symbols Nerd Font Mono", sans-serif;
     font-size: 13px;
     min-height: 0;
 }
@@ -35,16 +40,24 @@ tooltip label {
     color: @fg;
 }
 
+/* Block-highlight workspaces, same idea as Skilledcamman/.DarkSide's
+ * #workspaces button.active { background: ... } -- a filled rounded block
+ * behind the active workspace instead of just tinting the number. */
 #workspaces button {
     all: unset;
     padding: 0 6px;
-    color: alpha(@fg, 0.4);
-    transition: color .2s ease;
+    margin: 3px 2px;
+    border-radius: 8px;
+    color: alpha(@fg, 0.5);
+    transition: all .2s ease;
 }
 #workspaces button.active {
-    color: @accent;
+    background: @accent;
+    color: @bg;
+    padding: 0 10px;
 }
 #workspaces button:hover {
+    background: alpha(@accent, 0.25);
     color: @fg;
 }
 
@@ -54,9 +67,20 @@ tooltip label {
 #network,
 #bluetooth,
 #battery,
-#custom-power {
+#custom-power,
+#custom-usage-toggle,
+#cpu,
+#memory,
+#disk {
     padding: 0 8px;
     color: @fg;
+}
+
+#custom-usage-toggle:hover,
+#cpu,
+#memory,
+#disk {
+    color: alpha(@fg, 0.8);
 }
 
 #battery.warning:not(.charging) {
