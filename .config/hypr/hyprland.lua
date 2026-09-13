@@ -1,6 +1,10 @@
 -- Migrated from hyprland.conf (hyprlang syntax deprecated since 0.55,
 -- removed in 0.57). See https://wiki.hypr.land/Configuring/Start/
 
+require("modules.env")
+require("modules.input")
+require("modules.autostart")
+
 local mod = "SUPER"
 
 ------------------
@@ -22,7 +26,7 @@ hl.monitor({
 -- wal-bg #110915  wal-fg #c3c1c4  wal-orange #A37E56  wal-urgent #63514C
 hl.config({
     general = {
-        gaps_in     = 8,
+        gaps_in     = 3,
         gaps_out    = 8,
         border_size = 2,
 
@@ -81,12 +85,6 @@ hl.workspace_rule({ workspace = "10", default_name = "MON" })
 -- has no Hyprland equivalent needed here since we're not aiming to remove
 -- that edge gap for single windows in the first place.
 
-hl.config({
-    input = {
-        follow_mouse = 1,
-    },
-})
-
 -- dwindle already auto-splits by window aspect ratio, same effect as the
 -- i3 config's `exec_always autotiling`
 hl.config({
@@ -101,17 +99,30 @@ hl.config({
 
 hl.on("hyprland.start", function()
     hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("dunst")
-    hl.exec_cmd("hypridle")
     hl.exec_cmd("nm-applet")
-    hl.exec_cmd("blueman-applet")
-    hl.exec_cmd("copyq")
+    hl.exec_cmd("copyq --start-server")
+    -- hyprsunset.service is enabled but only starts under graphical-session.target,
+    -- which nothing in this session reaches -- start the unit directly instead of
+    -- the target so hypridle (also gated on that target) stays untouched.
+    hl.exec_cmd("systemctl --user start hyprsunset")
 end)
 
 -- Matrix idle window's own startup_mode = "Fullscreen" in matrix-idle.toml
 -- requests real fullscreen directly from the client -- no Hyprland-side
 -- window rule needed (and windowrulev2 is deprecated in this build anyway).
+
+-- CopyQ: disable_tray=true in its own config means it has no tray icon to
+-- hide into, so it force-shows its main window the moment its server starts.
+-- Route around that instead of fighting it: let it start (and begin
+-- recording clipboard history) at login as normal, but immediately banish
+-- its window to a hidden special workspace, same scratchpad trick as
+-- "special:scratchpad" below. mod+P then just toggles that workspace into
+-- view instead of asking CopyQ to show/hide itself.
+hl.window_rule({
+    name      = "copyq-hidden",
+    match     = { class = "com.github.hluk.copyq" },
+    workspace = "special:copyq silent",
+})
 
 ---------------------
 ---- KEYBINDINGS ----
@@ -144,7 +155,8 @@ hl.bind(mod .. " + SHIFT + 0", hl.dsp.window.move({ workspace = 10 }))
 -- Launch / windows
 hl.bind(mod .. " + RETURN",       hl.dsp.exec_cmd("alacritty"))
 hl.bind(mod .. " + Q",            hl.dsp.window.close())
-hl.bind(mod .. " + D",            hl.dsp.exec_cmd("rofi -show drun"))
+-- mod+D: launcher -- quickshell removed, rofi not wired up yet (next phase)
+-- hl.bind(mod .. " + D", hl.dsp.exec_cmd("rofi -show drun"))
 hl.bind(mod .. " + F",            hl.dsp.window.fullscreen({}))
 hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.float({}))
 hl.bind(mod .. " + SPACE",        hl.dsp.window.float({}))
@@ -206,7 +218,7 @@ hl.bind(mod .. " + Print", hl.dsp.exec_cmd('grim ~/Pictures/screenshot-$(date +%
 
 -- Clipboard history (same tool as the i3 rice: CopyQ, native GUI with image
 -- thumbnails -- no cliphist/rofi scripting needed)
-hl.bind(mod .. " + P", hl.dsp.exec_cmd("copyq show"))
+hl.bind(mod .. " + P", hl.dsp.workspace.toggle_special("copyq"))
 
 -- Scratchpad -> Hyprland's named special workspace
 hl.bind(mod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special:scratchpad" }))
