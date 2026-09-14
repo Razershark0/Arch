@@ -173,9 +173,9 @@ Scope {
 
                         Text {
                             Layout.alignment: Qt.AlignHCenter
-                            text: "Welcome Raze"
-                            font.family: "JetBrains Mono"
-                            font.pixelSize: 18
+                            text: "󰌾"
+                            font.family: "Iosevka Nerd Font"
+                            font.pixelSize: 28
                             color: lockUI.failed ? "#f38ba8" : "#A37E56"
                         }
 
