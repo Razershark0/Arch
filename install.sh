@@ -18,10 +18,6 @@ fi
 echo "==> Installing AUR packages..."
 yay -S --needed --noconfirm - < aur-packages.txt
 
-echo "==> Installing unimatrix (matrix-rain idle screen, via pipx)..."
-pipx ensurepath
-pipx install "git+https://github.com/will8211/unimatrix.git" || true
-
 echo "==> Deploying Serpantinum (the custom Quickshell desktop shell)..."
 mkdir -p "$HOME/.local/share"
 rm -rf "$HOME/.local/share/serpantinum"
@@ -38,12 +34,8 @@ cp -r config/hypr "$HOME/.config/hypr"
 cp -r config/alacritty "$HOME/.config/alacritty"
 sed -i "s|/home/[^/]*/|$HOME/|g" "$HOME/.config/hypr/hyprpaper.conf"
 
-mkdir -p "$HOME/.local/bin"
-cp bin/matrix-idle.sh "$HOME/.local/bin/matrix-idle.sh"
-chmod +x "$HOME/.local/bin/matrix-idle.sh"
-
 echo "==> Deploying Serpantinum's reference settings (theme, bar layout, idle"
-echo "    schedule: matrix at 5 min, suspend+lock at 10 min)..."
+echo "    schedule: lock w/ matrix background at 5 min, suspend at 10 min)..."
 mkdir -p "$HOME/.config/serpantinum"
 sed "s|/home/[^/]*/|$HOME/|g" config/serpantinum/settings.json > "$HOME/.config/serpantinum/settings.json"
 
@@ -95,5 +87,5 @@ echo "    ~/.config/hypr/hyprpaper.conf (edit that path if you want a different"
 echo "    image/location), then reboot and log in at the console --"
 echo "    Hyprland + Serpantinum will start automatically."
 echo ""
-echo "    Keybinds:  mod+D launcher, mod+C clipboard, mod+L lock, mod+M test the"
-echo "    idle matrix screen on demand, mod+R reload the shell."
+echo "    Keybinds:  mod+D launcher, mod+C clipboard, mod+L lock (shows the"
+echo "    matrix rain background), mod+R reload the shell."

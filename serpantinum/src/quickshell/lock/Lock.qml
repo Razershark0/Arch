@@ -85,7 +85,59 @@ Scope {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: "#00000055"
+                    color: "#00000099"
+                }
+
+                Canvas {
+                    id: matrixCanvas
+                    anchors.fill: parent
+
+                    readonly property int charSize: 16
+                    readonly property string charset: {
+                        let s = "0123456789";
+                        for (let c = 0xFF66; c <= 0xFF9D; c++) s += String.fromCharCode(c);
+                        return s;
+                    }
+                    property var columns: []
+
+                    function resetColumns() {
+                        let n = Math.ceil(width / charSize);
+                        let arr = [];
+                        for (let i = 0; i < n; i++) {
+                            arr.push({ y: Math.random() * -40, speed: 0.4 + Math.random() * 0.5 });
+                        }
+                        columns = arr;
+                    }
+
+                    Component.onCompleted: resetColumns()
+                    onWidthChanged: resetColumns()
+                    onHeightChanged: resetColumns()
+
+                    onPaint: {
+                        let ctx = getContext("2d");
+                        ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.font = charSize + "px 'JetBrains Mono'";
+                        ctx.textBaseline = "top";
+                        for (let i = 0; i < columns.length; i++) {
+                            let col = columns[i];
+                            let ch = charset[Math.floor(Math.random() * charset.length)];
+                            ctx.fillStyle = (i % 7 === 0) ? "#e6ccff" : "#9b30ff";
+                            ctx.fillText(ch, i * charSize, col.y * charSize);
+                            col.y += col.speed;
+                            if (col.y * charSize > height && Math.random() > 0.975) {
+                                col.y = Math.random() * -20;
+                                col.speed = 0.4 + Math.random() * 0.5;
+                            }
+                        }
+                    }
+
+                    Timer {
+                        interval: 60
+                        running: true
+                        repeat: true
+                        onTriggered: matrixCanvas.requestPaint()
+                    }
                 }
 
                 Rectangle {

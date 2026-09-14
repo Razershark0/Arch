@@ -95,7 +95,7 @@
       "lock": {
         "id": "lock",
         "timeout": 300,
-        "enabled": false,
+        "enabled": true,
         "respectInhibitors": true,
         "mprisInhibit": false,
         "command": "",
@@ -123,22 +123,7 @@
         "isCustom": false
       }
     },
-    "customActions": [
-      {
-        "id": "matrix",
-        "name": "Matrix Screensaver",
-        "timeout": 300,
-        "enabled": true,
-        "respectInhibitors": true,
-        "mprisInhibit": false,
-        "warningTimeout": 0,
-        "warningCommand": "",
-        "beforeCommand": "",
-        "command": "$HOME/.local/bin/matrix-idle.sh",
-        "resumeCommand": "kill \"$(cat /tmp/matrix-idle.pid 2>/dev/null)\" 2>/dev/null; rm -f /tmp/matrix-idle.pid",
-        "isCustom": true
-      }
-    ]
+    "customActions": []
   },
   "notifications": {
     "dnd": false,

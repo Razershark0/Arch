@@ -57,7 +57,6 @@ hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("serpantinum msg toggle clipboard"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle autohide"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("serpantinum lock"), { locked = true })
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("serpantinum ipc call idle trigger matrix"))
 
 for i = 1, 10 do
   local ws = tostring(i)

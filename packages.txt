@@ -44,7 +44,6 @@ pipewire-pulse
 playerctl
 python
 python-fonttools
-python-pipx
 python-websockets
 qt5ct
 qt5-graphicaleffects
