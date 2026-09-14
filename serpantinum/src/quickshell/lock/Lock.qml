@@ -92,7 +92,16 @@ Scope {
                     id: matrixCanvas
                     anchors.fill: parent
 
-                    readonly property int charSize: 16
+                    // Matches JetBrains Mono's real cell proportions at the
+                    // 16pt the rest of this desktop uses (advance width is
+                    // 0.6em, line height ~1.32em -- measured off the font's
+                    // own hhea/hmtx tables, not guessed), so a column reads
+                    // as the same size as it did in the old terminal-based
+                    // version instead of the smaller square cells before.
+                    readonly property int fontPixelSize: 22
+                    readonly property int colWidth: 13
+                    readonly property int rowHeight: 24
+
                     readonly property string charset: {
                         let s = "0123456789";
                         for (let c = 0xFF66; c <= 0xFF9D; c++) s += String.fromCharCode(c);
@@ -101,10 +110,10 @@ Scope {
                     property var columns: []
 
                     function resetColumns() {
-                        let n = Math.ceil(width / charSize);
+                        let n = Math.ceil(width / colWidth);
                         let arr = [];
                         for (let i = 0; i < n; i++) {
-                            arr.push({ y: Math.random() * -40, speed: 0.4 + Math.random() * 0.5 });
+                            arr.push({ y: Math.random() * -40 });
                         }
                         columns = arr;
                     }
@@ -117,23 +126,25 @@ Scope {
                         let ctx = getContext("2d");
                         ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
                         ctx.fillRect(0, 0, width, height);
-                        ctx.font = charSize + "px 'JetBrains Mono'";
+                        ctx.font = fontPixelSize + "px 'JetBrains Mono'";
                         ctx.textBaseline = "top";
                         for (let i = 0; i < columns.length; i++) {
                             let col = columns[i];
                             let ch = charset[Math.floor(Math.random() * charset.length)];
                             ctx.fillStyle = (i % 7 === 0) ? "#e6ccff" : "#9b30ff";
-                            ctx.fillText(ch, i * charSize, col.y * charSize);
-                            col.y += col.speed;
-                            if (col.y * charSize > height && Math.random() > 0.975) {
+                            ctx.fillText(ch, i * colWidth, col.y * rowHeight);
+                            // uniform one-row-per-tick cascade, matching
+                            // unimatrix's own default (non-async) timing at
+                            // speed 92: (100-92)*10 = 80ms per row.
+                            col.y += 1;
+                            if (col.y * rowHeight > height && Math.random() > 0.975) {
                                 col.y = Math.random() * -20;
-                                col.speed = 0.4 + Math.random() * 0.5;
                             }
                         }
                     }
 
                     Timer {
-                        interval: 60
+                        interval: 80
                         running: true
                         repeat: true
                         onTriggered: matrixCanvas.requestPaint()
