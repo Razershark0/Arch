@@ -126,7 +126,13 @@ Scope {
                         let ctx = getContext("2d");
                         ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
                         ctx.fillRect(0, 0, width, height);
-                        ctx.font = fontPixelSize + "px 'JetBrains Mono'";
+                        // QtQuick's Context2D font parser rejects any
+                        // quoted/spaced family name outright (confirmed via
+                        // direct testing -- "JetBrains Mono" silently fails
+                        // every frame regardless of quote style, falling
+                        // back to a tiny default), so this has to be a
+                        // generic CSS family keyword, not the real font.
+                        ctx.font = fontPixelSize + "px monospace";
                         ctx.textBaseline = "top";
                         for (let i = 0; i < columns.length; i++) {
                             let col = columns[i];
