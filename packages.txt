@@ -68,12 +68,10 @@ ueberzugpp
 ufw
 unzip
 upower
-waterfox-bin
 wget
 wireplumber
 wl-clipboard
 xdg-desktop-portal-hyprland
-yay
 yazi
 zathura
 zathura-pdf-mupdf
