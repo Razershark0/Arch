@@ -16,7 +16,10 @@ if ! command -v yay &> /dev/null; then
 fi
 
 echo "==> Installing AUR packages..."
-yay -S --needed --noconfirm - < aur-packages.txt
+# yay opens /dev/tty directly even with --noconfirm, which fails under a
+# non-interactive/piped invocation (e.g. a CI runner or an agent's shell) --
+# script(1) allocates a real pty so it has one to open.
+script -qec "yay -S --needed --noconfirm - < aur-packages.txt" /dev/null
 
 echo "==> Deploying Serpantinum (the custom Quickshell desktop shell)..."
 mkdir -p "$HOME/.local/share"
@@ -30,6 +33,7 @@ sudo ln -sf "$HOME/.local/share/serpantinum/bin/serpantinumd" /usr/local/bin/ser
 
 echo "==> Deploying Hyprland + Alacritty config..."
 mkdir -p "$HOME/.config"
+rm -rf "$HOME/.config/hypr" "$HOME/.config/alacritty"
 cp -r config/hypr "$HOME/.config/hypr"
 cp -r config/alacritty "$HOME/.config/alacritty"
 sed -i "s|/home/[^/]*/|$HOME/|g" "$HOME/.config/hypr/hyprpaper.conf"
@@ -56,7 +60,11 @@ sudo ufw default allow outgoing
 sudo ufw --force enable
 sudo systemctl enable --now tlp
 systemctl --user enable --now hyprpolkitagent
-systemctl --user enable --now easyeffects
+# easyeffects doesn't actually ship a systemd user unit (confirmed via
+# `pacman -Ql easyeffects` -- no .service file at all); this has always
+# silently no-op'd, including in the live autostart config, so it's
+# harmless -- just don't let it abort the script under set -e.
+systemctl --user enable --now easyeffects || true
 
 echo "==> Setting lid-close to suspend..."
 if ! grep -q "^HandleLidSwitch=suspend" /etc/systemd/logind.conf 2>/dev/null; then
