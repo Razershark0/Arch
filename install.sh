@@ -34,6 +34,10 @@ cp -r config/hypr "$HOME/.config/hypr"
 cp -r config/alacritty "$HOME/.config/alacritty"
 sed -i "s|/home/[^/]*/|$HOME/|g" "$HOME/.config/hypr/hyprpaper.conf"
 
+echo "==> Deploying the reference wallpaper..."
+mkdir -p "$HOME/Pictures/wallpapers"
+cp config/wallpaper/mimikyu.jpg "$HOME/Pictures/wallpapers/mimikyu.jpg"
+
 echo "==> Deploying Serpantinum's reference settings (theme, bar layout, idle"
 echo "    schedule: lock w/ matrix background at 5 min, suspend at 10 min)..."
 mkdir -p "$HOME/.config/serpantinum"
