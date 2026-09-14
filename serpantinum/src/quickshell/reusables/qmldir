@@ -1,0 +1,8 @@
+FlipIcon 1.0 FlipIcon.qml
+Input 1.0 Input.qml
+ClickButton 1.0 ClickButton.qml
+IconButton 1.0 IconButton.qml
+Draggable 1.0 Draggable.qml
+PasswordInput 1.0 PasswordInput.qml
+CanvasIconButton 1.0 CanvasIconButton.qml
+FillButton 1.0 FillButton.qml

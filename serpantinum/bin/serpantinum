@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+BIN_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+if [ -z "$SERPANTINUM_DIR" ]; then
+    export SERPANTINUM_DIR="$(dirname "$BIN_DIR")/src"
+fi
+
+source "$SERPANTINUM_DIR/scripts/caching.sh"
+source "$SERPANTINUM_DIR/scripts/config.sh"
+source "$SERPANTINUM_DIR/scripts/i18n.sh"
+
+if [ -z "$MAIN_QML" ]; then
+    export MAIN_QML="$SERPANTINUM_DIR/quickshell/Shell.qml"
+fi
+
+PIDFILE="/tmp/serpantinumd.pid"
+LOCKFILE="/tmp/serpantinumd.lock"
+
+is_alive() {
+    local pid="$1"
+    [ -n "$pid" ] || return 1
+    kill -0 "$pid" 2>/dev/null || return 1
+    if [ -f "/proc/$pid/status" ] && grep -q '^State:[[:space:]]*Z' "/proc/$pid/status" 2>/dev/null; then
+        return 1
+    fi
+    return 0
+}
+
+terminate_and_wait() {
+    local pid="$1"
+    local timeout="${2:-2}"
+    local count=0
+    local max_count=$(( timeout * 10 ))
+
+    [ -n "$pid" ] && is_alive "$pid" || return 0
+
+    kill -TERM "$pid" 2>/dev/null
+    while is_alive "$pid" && [ "$count" -lt "$max_count" ]; do
+        sleep 0.1
+        ((count++))
+    done
+    is_alive "$pid" && kill -KILL "$pid" 2>/dev/null
+}
+
+show_help() {
+    echo "Usage: serpantinum [command] [options]"
+    echo ""
+    echo "A desktop shell for wayland compositors."
+    echo ""
+    echo "Commands:"
+    echo "  msg <action|workspace> ...   Dispatch commands or workspace switches"
+    echo "  ipc ...                       Forward IPC calls directly to the shell"
+    echo "  kill                          Cleanly stop the running daemon"
+    echo ""
+    echo "Script commands:"
+    echo "  volume                        Control default audio sink/source volume"
+    echo "  reload                        Force reload quickshell elements"
+    echo "  screenshot                    Capture screen images or record video"
+    echo "  brightness                    Adjust backlight display brightness"
+    echo "  monitors_detect               Query active display outputs"
+    echo ""
+    echo "Options:"
+    echo "  -v, --verbose"
+    echo "  -V, --version"
+    echo "  -h, --help"
+    echo ""
+    echo "Examples:"
+    echo "  serpantinum msg workspace 1"
+    echo "  serpantinum msg toggle launcher"
+    echo "  serpantinum msg toggle clipboard"
+    echo "  serpantinum kill"
+}
+
+show_msg_help() {
+    echo "Usage: serpantinum msg <command> [args...]"
+    echo ""
+    echo "Available commands:"
+    echo "  workspace <num> [move]   Switch (or move focused window) to workspace"
+    echo "  open <target> [sub]      Open a target widget"
+    echo "  toggle <target> [sub]    Toggle a target widget"
+    echo "  close                    Close the currently open widget"
+}
+
+ensure_daemon() {
+    local pid=""
+    [ -f "$PIDFILE" ] && pid="$(cat "$PIDFILE" 2>/dev/null)"
+
+    if [ -z "$pid" ] || ! is_alive "$pid"; then
+        rm -f "$PIDFILE" "$LOCKFILE" 2>/dev/null
+        [ "$VERBOSE" = true ] && echo "Starting daemon..."
+        "$BIN_DIR/serpantinumd" start > /dev/null 2>&1 &
+
+        local count=0
+        while [ "$count" -lt 15 ]; do
+            [ -f "$PIDFILE" ] && is_alive "$(cat "$PIDFILE" 2>/dev/null)" && break
+            sleep 0.1
+            ((count++))
+        done
+    fi
+}
+
+VERBOSE=false
+
+while [[ "$1" == -* ]]; do
+    case "$1" in
+        -v|--verbose) VERBOSE=true; export SERPANTINUM_VERBOSE=true; shift ;;
+        -V|--version) echo "serpantinum v1.0.0"; exit 0 ;;
+        -h|--help) show_help; exit 0 ;;
+        *) break ;;
+    esac
+done
+
+[ $# -eq 0 ] && { show_help; exit 0; }
+
+if [[ "$1" == "kill" ]]; then
+    pid=""
+    [ -f "$PIDFILE" ] && pid="$(cat "$PIDFILE" 2>/dev/null)"
+    [ -n "$MAIN_QML" ] && pkill -TERM -f "quickshell.*$MAIN_QML" 2>/dev/null
+
+    if [ -n "$pid" ] && is_alive "$pid"; then
+        terminate_and_wait "$pid" 2
+    fi
+
+    [ -n "$MAIN_QML" ] && pkill -KILL -f "quickshell.*$MAIN_QML" 2>/dev/null
+    rm -f "$PIDFILE" "$LOCKFILE" 2>/dev/null
+    echo "Daemon stopped."
+    exit 0
+fi
+
+if [[ "$1" == "msg" ]]; then
+    if [[ "$2" == "-h" || "$2" == "--help" || -z "$2" ]]; then
+        show_msg_help
+        exit 0
+    fi
+    ensure_daemon
+    shift
+    [[ "$1" == "workspace" ]] && shift
+    exec "$SERPANTINUM_DIR/scripts/qs_manager.sh" "$@"
+fi
+
+if [[ "$1" == "ipc" ]]; then
+    ensure_daemon
+    shift
+    exec quickshell -p "$MAIN_QML" ipc "$@"
+fi
+
+ALLOWED_SCRIPTS=("volume" "reload" "screenshot" "brightness" "monitors_detect" "lock")
+
+COMMAND="$1"
+IS_ALLOWED=false
+for s in "${ALLOWED_SCRIPTS[@]}"; do
+    [[ "$COMMAND" == "$s" ]] && IS_ALLOWED=true && break
+done
+
+SCRIPT_PATH="$SERPANTINUM_DIR/scripts/${COMMAND}.sh"
+
+if [ "$IS_ALLOWED" = true ] && [ -f "$SCRIPT_PATH" ]; then
+    shift
+    if [ "$VERBOSE" = true ]; then
+        exec "$SCRIPT_PATH" --verbose "$@"
+    else
+        exec "$SCRIPT_PATH" "$@"
+    fi
+else
+    echo "Error: unknown command '$COMMAND'."
+    show_help
+    exit 1
+fi

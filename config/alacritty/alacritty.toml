@@ -1,0 +1,50 @@
+[window]
+opacity = 0.75
+padding = { x = 4, y = 4 }
+decorations = "None"
+
+[font]
+normal = { family = "JetBrains Mono", style = "Regular" }
+bold = { family = "JetBrains Mono", style = "Bold" }
+italic = { family = "JetBrains Mono", style = "Italic" }
+bold_italic = { family = "JetBrains Mono", style = "Bold Italic" }
+size = 16.0
+
+[scrolling]
+history = 2000
+multiplier = 1
+
+[bell]
+duration = 0
+
+[colors.primary]
+background = "#161b22"
+foreground = "#c9d1d9"
+
+[colors.cursor]
+text = "#010409"
+cursor = "#58a6ff"
+
+[colors.selection]
+text = "#010409"
+background = "#d29922"
+
+[colors.normal]
+black   = "#21262d"
+red     = "#f85149"
+green   = "#58a6ff"
+yellow  = "#f0883e"
+blue    = "#3fb950"
+magenta = "#388bfd"
+cyan    = "#d29922"
+white   = "#8b949e"
+
+[colors.bright]
+black   = "#b1bac4"
+red     = "#f85149"
+green   = "#388bfd"
+yellow  = "#d2a8ff"
+blue    = "#d29922"
+magenta = "#bc8cff"
+cyan    = "#d2a8ff"
+white   = "#c9d1d9"

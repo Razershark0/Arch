@@ -1,0 +1,10 @@
+MediaWidget 1.0 MediaWidget.qml
+LeftWidget 1.0 LeftWidget.qml
+PowerWidget 1.0 PowerWidget.qml
+WorkspacesWidget 1.0 WorkspacesWidget.qml
+TimeDateWidget 1.0 TimeDateWidget.qml
+
+SysMonWidget 1.0 system/SysMonWidget.qml
+BatWidget 1.0 system/BatWidget.qml
+BtWidget 1.0 system/BtWidget.qml
+WifiWidget 1.0 system/WifiWidget.qml

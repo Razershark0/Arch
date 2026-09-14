@@ -1,0 +1,161 @@
+{
+  "general": {
+    "language": "en",
+    "avatarPath": "",
+    "muteSfx": false,
+    "screenshotCaptureOnRelease": true,
+    "weatherInterval": 15,
+    "weatherUnit": "metric"
+  },
+  "syspanel": {
+    "clipExpandProgress": 0,
+    "clipExpanded": false,
+    "clipState": 1
+  },
+  "bar": {
+    "position": "top",
+    "width": 32,
+    "opacity": 100,
+    "style": "fill",
+    "time": {
+      "format": "HH:mm"
+    },
+    "autohide": false,
+    "autohideTimeout": 1000,
+    "modules": {
+      "left": [
+        "left",
+        "workspaces",
+        "media"
+      ],
+      "center": [
+        "timedate"
+      ],
+      "right": [
+        [
+          "wifi",
+          "bt",
+          "bat",
+          "sysmon",
+          "power"
+        ]
+      ]
+    },
+    "distinctPills": true,
+    "workspaceCount": 8,
+    "groupColors": {
+      "g_kb": "#bc8cff",
+      "g_wifi": "#d2a8ff"
+    }
+  },
+  "theme": {
+    "fontFamily": "Adwaita Mono",
+    "borderRadius": 4,
+    "activePreset": "GitHub Dark",
+    "matugen": false,
+    "colors": {
+      "base": "#0d1117",
+      "blue": "#58a6ff",
+      "crust": "#010409",
+      "green": "#3fb950",
+      "mantle": "#010409",
+      "maroon": "#f85149",
+      "mauve": "#bc8cff",
+      "overlay0": "#484f58",
+      "overlay1": "#6e7681",
+      "overlay2": "#8b949e",
+      "peach": "#f0883e",
+      "pink": "#d2a8ff",
+      "red": "#f85149",
+      "sapphire": "#388bfd",
+      "subtext0": "#8b949e",
+      "subtext1": "#b1bac4",
+      "surface0": "#161b22",
+      "surface1": "#21262d",
+      "surface2": "#30363d",
+      "teal": "#39c5cf",
+      "text": "#c9d1d9",
+      "yellow": "#d29922"
+    }
+  },
+  "idle": {
+    "enabled": true,
+    "manualInhibit": false,
+    "actions": {
+      "dim": {
+        "id": "dim",
+        "timeout": 150,
+        "enabled": false,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "lock": {
+        "id": "lock",
+        "timeout": 300,
+        "enabled": false,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "dpms": {
+        "id": "dpms",
+        "timeout": 450,
+        "enabled": false,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "suspend": {
+        "id": "suspend",
+        "timeout": 600,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      }
+    },
+    "customActions": [
+      {
+        "id": "matrix",
+        "name": "Matrix Screensaver",
+        "timeout": 300,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "warningTimeout": 0,
+        "warningCommand": "",
+        "beforeCommand": "",
+        "command": "$HOME/.local/bin/matrix-idle.sh",
+        "resumeCommand": "kill \"$(cat /tmp/matrix-idle.pid 2>/dev/null)\" 2>/dev/null; rm -f /tmp/matrix-idle.pid",
+        "isCustom": true
+      }
+    ]
+  },
+  "notifications": {
+    "dnd": false,
+    "position": "top right",
+    "sound": true,
+    "soundFile": "",
+    "horizontalPosition": 88,
+    "verticalPosition": 17,
+    "showEmptyGraphic": true
+  },
+  "display": {
+    "monitors": {
+      "eDP-1": {
+        "enabled": false,
+        "scale": 1
+      }
+    }
+  },
+  "wallpaperDir": "/home/Raze/Pictures/Wallpapers"
+}

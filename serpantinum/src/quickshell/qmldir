@@ -1,0 +1,35 @@
+Main 1.0 Main.qml
+
+Bar 1.0 bar/Bar.qml
+Clipboard 1.0 clipboard/Clipboard.qml
+Launcher 1.0 launcher/Launcher.qml
+ScreenshotOverlay 1.0 screenshot/ScreenshotOverlay.qml
+Lock 1.0 lock/Lock.qml
+Idle 1.0 idle/Idle.qml
+
+Osd 1.0 popouts/Osd.qml
+PopoutManager 1.0 popouts/PopoutManager.qml
+
+NotificationPopups 1.0 notifications/NotificationPopups.qml
+SystemPanel 1.0 popouts/SystemPanel.qml
+singleton NotificationManager 1.0 notifications/NotificationManager.qml
+
+
+singleton Audio 1.0 singletons/audio/Audio.qml
+singleton MprisController 1.0 singletons/audio/MprisController.qml
+
+singleton Scaler 1.0 singletons/theme/Scaler.qml
+singleton ThemeBackend 1.0 singletons/theme/ThemeBackend.qml
+
+singleton Caching 1.0 singletons/system/Caching.qml
+singleton Config 1.0 singletons/system/Config.qml
+singleton DateTime 1.0 singletons/system/DateTime.qml
+singleton I18n 1.0 singletons/system/I18n.qml
+
+singleton SysData 1.0 singletons/info/SysData.qml
+singleton SystemInfo 1.0 singletons/info/SystemInfo.qml
+
+singleton ClipboardController 1.0 singletons/widgetcontrols/ClipboardController.qml
+singleton LauncherController 1.0 singletons/widgetcontrols/LauncherController.qml
+singleton OsdController 1.0 singletons/widgetcontrols/OsdController.qml
+singleton SystemPanelController 1.0 singletons/widgetcontrols/SystemPanelController.qml
