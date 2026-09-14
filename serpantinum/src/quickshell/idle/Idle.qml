@@ -317,11 +317,19 @@ Item {
         }
     }
 
+    // Set by a manual trigger (mod+M / `idle trigger <name>`) so the watcher
+    // below can resume it on real activity. Actions reached via their own
+    // real timeout instead resume through the per-action IdleMonitor in the
+    // Repeater below -- a manual trigger never makes that IdleMonitor go
+    // idle, so without this, resumeAction() would never fire for it.
+    property var activeManualAction: null
+
     function executeAction(name) {
         if (!name) return;
         let target = name.toString().trim().toLowerCase();
         let actionObj = idleRoot.allActions.find(a => (a.id && a.id.toLowerCase() === target) || (a.name && a.name.toLowerCase() === target));
         if (actionObj) {
+            idleRoot.activeManualAction = actionObj;
             idleRoot.triggerAction(actionObj);
         }
     }
@@ -331,6 +339,19 @@ Item {
         function trigger(name: string): void { idleRoot.executeAction(name); }
         function execute(name: string): void { idleRoot.executeAction(name); }
         function run(name: string): void { idleRoot.executeAction(name); }
+    }
+
+    IdleMonitor {
+        id: manualActivityWatcher
+        timeout: 1
+        enabled: idleRoot.activeManualAction !== null
+        onIsIdleChanged: {
+            if (!isIdle && idleRoot.activeManualAction) {
+                let act = idleRoot.activeManualAction;
+                idleRoot.activeManualAction = null;
+                idleRoot.resumeAction(act);
+            }
+        }
     }
 
     Repeater {

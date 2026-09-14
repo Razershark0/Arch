@@ -36,6 +36,12 @@ Scope {
         rootLock.locked = false;
     }
 
+    QtObject {
+        id: lockUI
+        property bool failed: false
+        property bool authenticating: false
+    }
+
     Timer {
         id: pamActionTimer
         interval: 350
@@ -52,8 +58,6 @@ Scope {
                 root.completeUnlock();
             } else {
                 lockUI.failed = true;
-                passwordInput.clear();
-                passwordInput.triggerShake();
                 pamActionTimer.restart();
             }
         }
@@ -140,10 +144,14 @@ Scope {
                     }
                 }
 
-                Item {
-                    id: lockUI
-                    property bool failed: false
-                    property bool authenticating: false
+                Connections {
+                    target: lockUI
+                    function onFailedChanged() {
+                        if (lockUI.failed) {
+                            passwordInput.clear();
+                            passwordInput.triggerShake();
+                        }
+                    }
                 }
 
                 MouseArea {
