@@ -391,7 +391,7 @@ Rectangle {
     Rectangle {
         id: visualItem
         anchors.fill: parent
-        radius: ThemeBackend.borderRadius
+        radius: s(9)
         clip: true
         implicitHeight: cardContent.implicitHeight + s(20)
 
