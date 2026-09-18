@@ -1,6 +1,6 @@
-# Serpantinum boot / disk-unlock screen: the lock screen's look (dimmed
-# wallpaper, "Passphrase" box, password field with one dot per typed
-# character). "Raze" is filled in by install.sh.
+# Serpantinum boot / disk-unlock screen: plain black, a white-outlined
+# "Passphrase" box with a white-outlined field under the title and one white
+# dot per typed character. Nothing is drawn until the passphrase is asked for.
 #
 # The box and the field are each drawn as a left end, a right end and a
 # stretched middle, so both grow wider as more characters are typed.
@@ -10,11 +10,6 @@ screen_h = Window.GetHeight();
 
 Window.SetBackgroundTopColor(0, 0, 0);
 Window.SetBackgroundBottomColor(0, 0, 0);
-
-# --- background: the wallpaper, already darkened in the image -----------------
-bg_image = Image("background.png");
-bg = Sprite(bg_image.Scale(screen_w, screen_h));
-bg.SetPosition(0, 0, -100);
 
 # --- sizes ---------------------------------------------------------------------
 dot_image = Image("dot.png");
@@ -46,13 +41,8 @@ field_l = Sprite(field_l_image);
 field_m = Sprite(field_m_image);
 field_r = Sprite(field_r_image);
 
-# --- greeting: same accent colour (#A37E56) as the lock screen -----------------
-greeting_image = Image.Text("Welcome @USER@", 0.639, 0.494, 0.337, 1, "Iosevka Nerd Font 22");
-greeting = Sprite(greeting_image);
-greeting.SetOpacity(0);
-
-# --- title while asking for the disk passphrase (this is not a sign-in) ----------
-title_image = Image.Text("Passphrase", 0.639, 0.494, 0.337, 1, "Iosevka Nerd Font 22");
+# --- title while asking for the disk passphrase ---------------------------------
+title_image = Image.Text("Passphrase", 1, 1, 1, 1, "Iosevka Nerd Font 22");
 title = Sprite(title_image);
 title.SetPosition(screen_w / 2 - title_image.GetWidth() / 2, box_y + 24, 11);
 title.SetOpacity(0);
@@ -98,7 +88,6 @@ fun draw() {
     field_r.SetPosition(local.field_x + local.field_w - field_cap, field_y, 11);
 
     if (mode == "password") {
-        greeting.SetOpacity(0);
         title.SetOpacity(local.o);
         box_l.SetOpacity(local.o);
         box_m.SetOpacity(local.o);
@@ -107,7 +96,6 @@ fun draw() {
         field_m.SetOpacity(local.o);
         field_r.SetOpacity(local.o);
     } else {
-        greeting.SetOpacity(local.o);
         title.SetOpacity(0);
         box_l.SetOpacity(0);
         box_m.SetOpacity(0);
@@ -115,8 +103,6 @@ fun draw() {
         field_l.SetOpacity(0);
         field_m.SetOpacity(0);
         field_r.SetOpacity(0);
-        greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2,
-                             screen_h / 2 - greeting_image.GetHeight() / 2, 11);
     }
 
     local.start = screen_w / 2 - (local.shown * dot_step) / 2 + (dot_step - dot_image.GetWidth()) / 2;
