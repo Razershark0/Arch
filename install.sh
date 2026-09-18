@@ -43,9 +43,15 @@ mkdir -p "$HOME/Pictures/wallpapers"
 cp config/wallpaper/mimikyu.jpg "$HOME/Pictures/wallpapers/mimikyu.jpg"
 
 echo "==> Deploying Serpantinum's reference settings (theme, bar layout, idle"
-echo "    schedule: lock w/ matrix background at 5 min, suspend at 10 min)..."
+echo "    schedule: lock w/ matrix at 5 min, screen off at 5.5 min, suspend at 10 min)..."
 mkdir -p "$HOME/.config/serpantinum"
 sed "s|/home/[^/]*/|$HOME/|g" config/serpantinum/settings.json > "$HOME/.config/serpantinum/settings.json"
+
+echo "==> Installing the Iosevka Nerd Font styles the shell uses (4 files, ~55 MB;"
+echo "    the full Arch package would be 1.1 GB)..."
+mkdir -p "$HOME/.local/share/fonts"
+rm -rf "$HOME/.local/share/fonts/IosevkaNerdFont"
+cp -r config/fonts/IosevkaNerdFont "$HOME/.local/share/fonts/IosevkaNerdFont"
 
 echo "==> Enabling nerd-font icon glyph fallback (keeps ttf-jetbrains-mono small"
 echo "    instead of needing the full nerd-font variant for icon glyphs)..."
