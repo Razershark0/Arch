@@ -160,8 +160,19 @@ DESKTOPEOF
 
 echo "==> Setting Hyprland to launch on tty1 login (no display manager)..."
 if ! grep -q "start-hyprland" "$HOME/.bash_profile" 2>/dev/null; then
-    echo 'if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then exec start-hyprland; fi' >> "$HOME/.bash_profile"
+    echo 'if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then exec start-hyprland >"$HOME/.cache/start-hyprland.log" 2>&1; fi' >> "$HOME/.bash_profile"
 fi
+
+# Silent tty1 autologin (no banner, hostname or hints between the boot splash
+# and Hyprland). The disk passphrase is the real gate on this machine.
+echo "==> Enabling silent tty1 autologin..."
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf >/dev/null << EOF
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin $USER --noclear --noissue --nohostname --nohints --skip-login %I \$TERM
+EOF
+touch "$HOME/.hushlogin"
 
 echo ""
 echo "==> Done. Drop a wallpaper image at the path set in"

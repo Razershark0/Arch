@@ -85,8 +85,8 @@
     "actions": {
       "dim": {
         "id": "dim",
-        "timeout": 240,
-        "enabled": false,
+        "timeout": 120,
+        "enabled": true,
         "respectInhibitors": true,
         "mprisInhibit": false,
         "command": "",
@@ -105,7 +105,7 @@
       },
       "dpms": {
         "id": "dpms",
-        "timeout": 330,
+        "timeout": 360,
         "enabled": true,
         "respectInhibitors": true,
         "mprisInhibit": false,

@@ -1,6 +1,9 @@
 # Serpantinum boot / disk-unlock screen: the lock screen's look (dimmed
 # wallpaper, "Welcome <user>" box, password field with one dot per typed
-# character). "@USER@" is filled in by install.sh.
+# character). "Raze" is filled in by install.sh.
+#
+# The box and the field are each drawn as a left end, a right end and a
+# stretched middle, so both grow wider as more characters are typed.
 
 screen_w = Window.GetWidth();
 screen_h = Window.GetHeight();
@@ -13,36 +16,48 @@ bg_image = Image("background.png");
 bg = Sprite(bg_image.Scale(screen_w, screen_h));
 bg.SetPosition(0, 0, -100);
 
-# --- the box (only while asking for a password) --------------------------------
-box_image = Image("box.png");
-box_x = screen_w / 2 - box_image.GetWidth() / 2;
-box_y = screen_h / 2 - box_image.GetHeight() / 2;
-box = Sprite(box_image);
-box.SetPosition(box_x, box_y, 10);
-box.SetOpacity(0);
+# --- sizes ---------------------------------------------------------------------
+dot_image = Image("dot.png");
+dot_step = 16;
+field_pad = 16;          # room left and right of the dots inside the field
+field_min_w = 272;       # width of the field when it is empty
+box_extra = 48;          # box is this much wider than the field
+max_dots = Math.Int((screen_w - box_extra - 2 * field_pad - 40) / dot_step);
+
+box_l_image = Image("box_left.png");
+box_m_image = Image("box_mid.png");
+box_r_image = Image("box_right.png");
+box_h = box_l_image.GetHeight();
+box_cap = box_l_image.GetWidth();
+box_y = Math.Int(screen_h / 2 - box_h / 2);
+
+field_l_image = Image("field_left.png");
+field_m_image = Image("field_mid.png");
+field_r_image = Image("field_right.png");
+field_h = field_l_image.GetHeight();
+field_cap = field_l_image.GetWidth();
+field_y = box_y + box_h - 24 - field_h;
+
+# --- the box and the field (only while asking for a password) -------------------
+box_l = Sprite(box_l_image);
+box_m = Sprite(box_m_image);
+box_r = Sprite(box_r_image);
+field_l = Sprite(field_l_image);
+field_m = Sprite(field_m_image);
+field_r = Sprite(field_r_image);
 
 # --- greeting: same accent colour (#A37E56) as the lock screen -----------------
 greeting_image = Image.Text("Welcome @USER@", 0.639, 0.494, 0.337, 1, "Iosevka Nerd Font 22");
 greeting = Sprite(greeting_image);
 greeting.SetOpacity(0);
 
-# --- password field, hint and dots ---------------------------------------------
-field_image = Image("field.png");
-field_x = screen_w / 2 - field_image.GetWidth() / 2;
-field_y = box_y + box_image.GetHeight() - 24 - field_image.GetHeight();
-field = Sprite(field_image);
-field.SetPosition(field_x, field_y, 11);
-field.SetOpacity(0);
-
+# --- hint and dots -----------------------------------------------------------------
 hint_image = Image.Text("Passphrase", 0.941, 0.890, 0.714, 0.4, "Iosevka Nerd Font 16");
 hint = Sprite(hint_image);
 hint.SetPosition(screen_w / 2 - hint_image.GetWidth() / 2,
-                 field_y + field_image.GetHeight() / 2 - hint_image.GetHeight() / 2, 12);
+                 field_y + field_h / 2 - hint_image.GetHeight() / 2, 12);
 hint.SetOpacity(0);
 
-dot_image = Image("dot.png");
-dot_step = 16;
-max_dots = 16;
 for (i = 0; i < max_dots; i++) {
     dots[i] = Sprite(dot_image);
     dots[i].SetOpacity(0);
@@ -52,33 +67,63 @@ for (i = 0; i < max_dots; i++) {
 mode = "normal";      # "normal" while booting, "password" while asking
 typed = 0;            # how many characters have been typed
 fade = 0;             # frames since start, drives the fade-in
+built_w = 0;          # field width the stretched middles were last built for
 
 fun draw() {
     local.o = fade / 40;
     if (local.o > 1) local.o = 1;
 
+    local.shown = typed;
+    if (local.shown > max_dots) local.shown = max_dots;
+
+    # widths follow the number of dots, never smaller than the empty size
+    local.field_w = local.shown * dot_step + 2 * field_pad;
+    if (local.field_w < field_min_w) local.field_w = field_min_w;
+    local.box_w = local.field_w + box_extra;
+    local.field_x = Math.Int(screen_w / 2 - local.field_w / 2);
+    local.box_x = Math.Int(screen_w / 2 - local.box_w / 2);
+
+    if (local.field_w != built_w) {
+        box_m.SetImage(box_m_image.Scale(local.box_w - 2 * box_cap, box_h));
+        field_m.SetImage(field_m_image.Scale(local.field_w - 2 * field_cap, field_h));
+        built_w = local.field_w;
+    }
+
+    box_l.SetPosition(local.box_x, box_y, 10);
+    box_m.SetPosition(local.box_x + box_cap, box_y, 10);
+    box_r.SetPosition(local.box_x + local.box_w - box_cap, box_y, 10);
+    field_l.SetPosition(local.field_x, field_y, 11);
+    field_m.SetPosition(local.field_x + field_cap, field_y, 11);
+    field_r.SetPosition(local.field_x + local.field_w - field_cap, field_y, 11);
+
     greeting.SetOpacity(local.o);
     if (mode == "password") {
-        box.SetOpacity(local.o);
-        field.SetOpacity(local.o);
+        box_l.SetOpacity(local.o);
+        box_m.SetOpacity(local.o);
+        box_r.SetOpacity(local.o);
+        field_l.SetOpacity(local.o);
+        field_m.SetOpacity(local.o);
+        field_r.SetOpacity(local.o);
         greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2, box_y + 24, 11);
         if (typed == 0) hint.SetOpacity(local.o);
         else hint.SetOpacity(0);
     } else {
-        box.SetOpacity(0);
-        field.SetOpacity(0);
+        box_l.SetOpacity(0);
+        box_m.SetOpacity(0);
+        box_r.SetOpacity(0);
+        field_l.SetOpacity(0);
+        field_m.SetOpacity(0);
+        field_r.SetOpacity(0);
         hint.SetOpacity(0);
         greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2,
                              screen_h / 2 - greeting_image.GetHeight() / 2, 11);
     }
 
-    local.shown = typed;
-    if (local.shown > max_dots) local.shown = max_dots;
     local.start = screen_w / 2 - (local.shown * dot_step) / 2 + (dot_step - dot_image.GetWidth()) / 2;
     for (local.i = 0; local.i < max_dots; local.i++) {
         if (mode == "password" && local.i < local.shown) {
             dots[local.i].SetPosition(local.start + local.i * dot_step,
-                                      field_y + field_image.GetHeight() / 2 - dot_image.GetHeight() / 2, 12);
+                                      field_y + field_h / 2 - dot_image.GetHeight() / 2, 12);
             dots[local.i].SetOpacity(local.o);
         } else {
             dots[local.i].SetOpacity(0);
