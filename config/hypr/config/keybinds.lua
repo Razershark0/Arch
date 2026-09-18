@@ -33,16 +33,18 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + bracketright", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + bracketleft", hl.dsp.focus({ workspace = "e-1" }))
 
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("serpantinum msg toggle notifpanel"))
+
 hl.bind("F9", hl.dsp.exec_cmd("serpantinum msg toggle cheatsheet"))
 hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd("serpantinum msg toggle cheatsheet"))
 
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("serpantinum brightness lower"), { locked = true })
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("serpantinum brightness raise"), { locked = true })
 
-hl.bind("Print", hl.dsp.exec_cmd("mkdir -p ~/Pictures/Screenshots; G=$(slurp) && [ -n \"$G\" ] && grim -g \"$G\" - | tee ~/Pictures/Screenshots/Screenshot_$(date +%Y-%m-%d-%H%M%S).png | wl-copy"), { locked = true })
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd("serpantinum screenshot --edit"), { locked = true })
-hl.bind("SUPER + Print", hl.dsp.exec_cmd("serpantinum screenshot --full"), { locked = true })
-hl.bind("SUPER + SHIFT + Print", hl.dsp.exec_cmd("serpantinum screenshot --full --edit"), { locked = true })
+hl.bind("Print", hl.dsp.exec_cmd("mkdir -p ~/Pictures/Screenshots; G=$(slurp) && [ -n \"$G\" ] && grim -g \"$G\" - | tee ~/Pictures/Screenshots/Screenshot_$(date +%Y-%m-%d-%H%M%S).png | wl-copy"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("serpantinum screenshot --edit"))
+hl.bind("SUPER + Print", hl.dsp.exec_cmd("serpantinum screenshot --full"))
+hl.bind("SUPER + SHIFT + Print", hl.dsp.exec_cmd("serpantinum screenshot --full --edit"))
 
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
