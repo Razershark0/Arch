@@ -282,6 +282,7 @@ Variants {
             Binding { target: BtPanelController; property: "topOffset"; value: barWindow.pillBottomY }
             Binding { target: BatPanelController; property: "panelWidth"; value: barWindow.systemPillWidth }
             Binding { target: BatPanelController; property: "topOffset"; value: barWindow.pillBottomY }
+            Binding { target: SystemPanelController; property: "topOffset"; value: barWindow.pillBottomY }
 
             TopBar {
                 id: contentWrapper

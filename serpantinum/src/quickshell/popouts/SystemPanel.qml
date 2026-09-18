@@ -23,18 +23,22 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     exclusionMode: ExclusionMode.Ignore
 
+    mask: Region { item: barHole; intersection: Intersection.Xor }
+
     anchors {
         top: true
         right: true
+        bottom: true
+        left: true
     }
 
-    margins {
-        top: s(50)
-        right: s(10)
+    Item {
+        id: barHole
+        x: 0
+        y: 0
+        width: panelWindow.width
+        height: SystemPanelController.topOffset + 6
     }
-
-    implicitWidth: content.width + s(24)
-    implicitHeight: content.height + s(24)
 
     MouseArea {
         anchors.fill: parent
@@ -42,7 +46,12 @@ PanelWindow {
     }
 
     Rectangle {
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: s(50)
+        anchors.rightMargin: s(10)
+        width: content.width + s(24)
+        height: content.height + s(24)
         radius: s(10)
         color: "#110915"
         border.width: 0

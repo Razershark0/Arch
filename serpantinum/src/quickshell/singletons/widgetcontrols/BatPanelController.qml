@@ -12,6 +12,7 @@ Item {
     function show() {
         WifiPanelController.hide();
         BtPanelController.hide();
+        SystemPanelController.hide();
         controller.isVisible = true;
     }
     function hide() { controller.isVisible = false; }

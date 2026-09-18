@@ -6,11 +6,15 @@ Item {
     id: controller
 
     property bool isVisible: false
+    property real topOffset: 0
 
     function show() {
         WifiPanelController.hide();
         BtPanelController.hide();
         BatPanelController.hide();
+        LauncherController.hide();
+        ClipboardController.hide();
+        CheatSheetController.hide();
         controller.isVisible = true;
     }
     function hide() { controller.isVisible = false; }
