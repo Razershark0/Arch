@@ -49,14 +49,64 @@ sed "s|/home/[^/]*/|$HOME/|g" config/serpantinum/settings.json > "$HOME/.config/
 
 echo "==> Installing the Iosevka Nerd Font styles the shell uses (4 files, ~55 MB;"
 echo "    the full Arch package would be 1.1 GB)..."
-mkdir -p "$HOME/.local/share/fonts"
-rm -rf "$HOME/.local/share/fonts/IosevkaNerdFont"
-cp -r config/fonts/IosevkaNerdFont "$HOME/.local/share/fonts/IosevkaNerdFont"
+# System-wide (not ~/.local) so root can see it too: the boot-time password
+# prompt is built by root and uses this font.
+sudo mkdir -p /usr/local/share/fonts
+sudo rm -rf /usr/local/share/fonts/IosevkaNerdFont
+sudo cp -r config/fonts/IosevkaNerdFont /usr/local/share/fonts/IosevkaNerdFont
 
 echo "==> Enabling nerd-font icon glyph fallback (keeps ttf-jetbrains-mono small"
 echo "    instead of needing the full nerd-font variant for icon glyphs)..."
 sudo ln -sf /usr/share/fontconfig/conf.avail/10-nerd-font-symbols.conf /etc/fonts/conf.d/
 fc-cache -f
+
+echo "==> Boot: no GRUB menu, and a graphical disk-passphrase screen that matches"
+echo "    the lock screen (needs GRUB + a systemd initramfs, like the reference"
+echo "    machine; skipped otherwise)..."
+if [ -f /etc/default/grub ] && grep -q '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
+    # The theme, with your username in the greeting.
+    sudo rm -rf /usr/share/plymouth/themes/serpantinum
+    sudo mkdir -p /usr/share/plymouth/themes/serpantinum
+    sudo cp config/plymouth/serpantinum/*.png config/plymouth/serpantinum/serpantinum.plymouth \
+        /usr/share/plymouth/themes/serpantinum/
+    sed "s/@USER@/$USER/g" config/plymouth/serpantinum/serpantinum.script \
+        | sudo tee /usr/share/plymouth/themes/serpantinum/serpantinum.script >/dev/null
+    sudo plymouth-set-default-theme serpantinum
+
+    # Keep the current initramfs as a rescue image, and a GRUB entry for it, in
+    # case the new one ever misbehaves (reach it with Esc during the 1 s GRUB wait).
+    [ -f /boot/initramfs-linux-backup.img ] || sudo cp /boot/initramfs-linux.img /boot/initramfs-linux-backup.img
+    if ! grep -q 'rescue: original initramfs' /etc/grub.d/40_custom; then
+        sudo tee -a /etc/grub.d/40_custom >/dev/null << EOF
+
+menuentry 'Arch Linux (rescue: original initramfs, no splash)' {
+	load_video
+	set gfxpayload=keep
+	insmod gzio
+	insmod part_gpt
+	insmod fat
+	search --no-floppy --fs-uuid --set=root $(findmnt -no UUID /boot)
+	linux	/vmlinuz-linux root=UUID=$(findmnt -no UUID /) rw loglevel=4 root=$(findmnt -no SOURCE /)
+	initrd	/initramfs-linux-backup.img
+}
+EOF
+    fi
+
+    # Plymouth in the initramfs, right after systemd.
+    sudo sed -i -E '/^HOOKS=/{/plymouth/!s/\bsystemd\b/systemd plymouth/}' /etc/mkinitcpio.conf
+
+    # GRUB: a hidden 1 s menu, a quiet splash command line, and no "Loading ..." lines.
+    sudo sed -i -E 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=1/; s/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=hidden/' /etc/default/grub
+    sudo sed -i -E '/^GRUB_CMDLINE_LINUX_DEFAULT=/{/splash/!s/"$/ splash vt.global_cursor_default=0 rd.udev.log_level=3 udev.log_level=3 systemd.show_status=false rd.systemd.show_status=false"/}' /etc/default/grub
+    # (GRUB has no switch for this; a grub package upgrade restores the two lines,
+    # so re-run this step after one.)
+    sudo sed -i '/echo.*"$message" | grub_quote/d' /etc/grub.d/10_linux
+
+    sudo mkinitcpio -P
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+else
+    echo "    (not a GRUB + systemd-initramfs machine -- skipping)"
+fi
 
 echo "==> Enabling services..."
 sudo systemctl enable --now NetworkManager

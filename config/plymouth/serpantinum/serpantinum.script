@@ -1,0 +1,112 @@
+# Serpantinum boot / disk-unlock screen: the lock screen's look (dimmed
+# wallpaper, "Welcome <user>" box, password field with one dot per typed
+# character). "@USER@" is filled in by install.sh.
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+# --- background: the wallpaper, already darkened in the image -----------------
+bg_image = Image("background.png");
+bg = Sprite(bg_image.Scale(screen_w, screen_h));
+bg.SetPosition(0, 0, -100);
+
+# --- the box (only while asking for a password) --------------------------------
+box_image = Image("box.png");
+box_x = screen_w / 2 - box_image.GetWidth() / 2;
+box_y = screen_h / 2 - box_image.GetHeight() / 2;
+box = Sprite(box_image);
+box.SetPosition(box_x, box_y, 10);
+box.SetOpacity(0);
+
+# --- greeting: same accent colour (#A37E56) as the lock screen -----------------
+greeting_image = Image.Text("Welcome @USER@", 0.639, 0.494, 0.337, 1, "Iosevka Nerd Font 22");
+greeting = Sprite(greeting_image);
+greeting.SetOpacity(0);
+
+# --- password field, hint and dots ---------------------------------------------
+field_image = Image("field.png");
+field_x = screen_w / 2 - field_image.GetWidth() / 2;
+field_y = box_y + box_image.GetHeight() - 24 - field_image.GetHeight();
+field = Sprite(field_image);
+field.SetPosition(field_x, field_y, 11);
+field.SetOpacity(0);
+
+hint_image = Image.Text("Passphrase", 0.941, 0.890, 0.714, 0.4, "Iosevka Nerd Font 16");
+hint = Sprite(hint_image);
+hint.SetPosition(screen_w / 2 - hint_image.GetWidth() / 2,
+                 field_y + field_image.GetHeight() / 2 - hint_image.GetHeight() / 2, 12);
+hint.SetOpacity(0);
+
+dot_image = Image("dot.png");
+dot_step = 16;
+max_dots = 16;
+for (i = 0; i < max_dots; i++) {
+    dots[i] = Sprite(dot_image);
+    dots[i].SetOpacity(0);
+}
+
+# --- state ---------------------------------------------------------------------
+mode = "normal";      # "normal" while booting, "password" while asking
+typed = 0;            # how many characters have been typed
+fade = 0;             # frames since start, drives the fade-in
+
+fun draw() {
+    local.o = fade / 40;
+    if (local.o > 1) local.o = 1;
+
+    greeting.SetOpacity(local.o);
+    if (mode == "password") {
+        box.SetOpacity(local.o);
+        field.SetOpacity(local.o);
+        greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2, box_y + 24, 11);
+        if (typed == 0) hint.SetOpacity(local.o);
+        else hint.SetOpacity(0);
+    } else {
+        box.SetOpacity(0);
+        field.SetOpacity(0);
+        hint.SetOpacity(0);
+        greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2,
+                             screen_h / 2 - greeting_image.GetHeight() / 2, 11);
+    }
+
+    local.shown = typed;
+    if (local.shown > max_dots) local.shown = max_dots;
+    local.start = screen_w / 2 - (local.shown * dot_step) / 2 + (dot_step - dot_image.GetWidth()) / 2;
+    for (local.i = 0; local.i < max_dots; local.i++) {
+        if (mode == "password" && local.i < local.shown) {
+            dots[local.i].SetPosition(local.start + local.i * dot_step,
+                                      field_y + field_image.GetHeight() / 2 - dot_image.GetHeight() / 2, 12);
+            dots[local.i].SetOpacity(local.o);
+        } else {
+            dots[local.i].SetOpacity(0);
+        }
+    }
+}
+
+fun password_callback(prompt, bullets) {
+    mode = "password";
+    typed = bullets;
+    draw();
+}
+
+fun normal_callback() {
+    mode = "normal";
+    typed = 0;
+    draw();
+}
+
+fun refresh_callback() {
+    if (fade < 40) {
+        fade++;
+        draw();
+    }
+}
+
+Plymouth.SetDisplayPasswordFunction(password_callback);
+Plymouth.SetDisplayNormalFunction(normal_callback);
+Plymouth.SetRefreshFunction(refresh_callback);
+
+draw();

@@ -42,6 +42,7 @@ pipewire
 pipewire-alsa
 pipewire-pulse
 playerctl
+plymouth
 python
 python-fonttools
 python-websockets
