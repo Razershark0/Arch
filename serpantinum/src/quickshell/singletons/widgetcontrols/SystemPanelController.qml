@@ -11,6 +11,7 @@ Item {
 
     function show() {
         WifiPanelController.hide();
+        NotifPanelController.hide();
         BtPanelController.hide();
         BatPanelController.hide();
         LauncherController.hide();

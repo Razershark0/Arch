@@ -60,8 +60,9 @@ PanelWindow {
                 ["Super + A", "Toggle bar autohide"],
                 ["Super + L", "Lock screen"],
                 ["Super + R", "Reload shell"],
+                ["Super + N", "Notifications"],
                 ["Super + Space", "Play / pause media"],
-                ["F9", "This cheat sheet"],
+                ["Super + Shift + /", "This cheat sheet"],
             ]
         },
         {

@@ -1,6 +1,7 @@
 MediaWidget 1.0 MediaWidget.qml
 LeftWidget 1.0 LeftWidget.qml
 PowerWidget 1.0 PowerWidget.qml
+NotifWidget 1.0 NotifWidget.qml
 WorkspacesWidget 1.0 WorkspacesWidget.qml
 TimeDateWidget 1.0 TimeDateWidget.qml
 

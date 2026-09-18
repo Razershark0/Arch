@@ -13,6 +13,7 @@ Item {
         WifiPanelController.hide();
         BatPanelController.hide();
         SystemPanelController.hide();
+        NotifPanelController.hide();
         controller.isVisible = true;
     }
     function hide() { controller.isVisible = false; }

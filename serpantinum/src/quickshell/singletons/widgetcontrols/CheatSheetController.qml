@@ -12,6 +12,7 @@ Item {
         BtPanelController.hide();
         BatPanelController.hide();
         SystemPanelController.hide();
+        NotifPanelController.hide();
         controller.isVisible = true;
     }
     function hide() { controller.isVisible = false; }

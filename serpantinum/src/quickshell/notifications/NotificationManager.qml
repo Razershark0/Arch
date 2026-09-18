@@ -12,6 +12,7 @@ Item {
     property bool sysPanelOpen: false
     property real lastNotifTime: 0
     property bool _isBatchUpdating: false
+    property int unreadCount: 0
 
     ListModel { id: historyModel }
     ListModel { id: popupsModel }
@@ -110,9 +111,22 @@ Item {
         if (changed) rebuildGroups();
     }
 
+    function markAllRead() {
+        let changed = false;
+        for (let i = 0; i < historyModel.count; i++) {
+            let nData = historyModel.get(i);
+            if (nData && !nData.read) {
+                historyModel.setProperty(i, "read", true);
+                changed = true;
+            }
+        }
+        if (changed) rebuildGroups();
+    }
+
     function rebuildGroups() {
         let groupedMap = {};
         let newOrder = [];
+        let unread = 0;
 
         for (let i = 0; i < historyModel.count; i++) {
             let nData = historyModel.get(i);
@@ -124,6 +138,8 @@ Item {
             if (nData.urgency === 2) {
                 gKey += "_crit_" + nData.uid;
             }
+
+            if (!nData.read) unread++;
 
             if (!groupedMap[gKey]) {
                 groupedMap[gKey] = {
@@ -167,6 +183,8 @@ Item {
                 groupedMap[gKey].unreadCount++;
             }
         }
+
+        root.unreadCount = unread;
 
         for (let i = groupedHistoryModel.count - 1; i >= 0; i--) {
             let item = groupedHistoryModel.get(i);
@@ -247,6 +265,7 @@ Item {
         historyModel.clear();
         popupsModel.clear();
         groupedHistoryModel.clear();
+        root.unreadCount = 0;
         root._isBatchUpdating = false;
     }
 

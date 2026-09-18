@@ -16,6 +16,7 @@ SystemPanel 1.0 popouts/SystemPanel.qml
 WifiPanel 1.0 popouts/WifiPanel.qml
 BtPanel 1.0 popouts/BtPanel.qml
 BatPanel 1.0 popouts/BatPanel.qml
+NotifPanel 1.0 popouts/NotifPanel.qml
 singleton NotificationManager 1.0 notifications/NotificationManager.qml
 
 
@@ -40,4 +41,5 @@ singleton SystemPanelController 1.0 singletons/widgetcontrols/SystemPanelControl
 singleton WifiPanelController 1.0 singletons/widgetcontrols/WifiPanelController.qml
 singleton BtPanelController 1.0 singletons/widgetcontrols/BtPanelController.qml
 singleton BatPanelController 1.0 singletons/widgetcontrols/BatPanelController.qml
+singleton NotifPanelController 1.0 singletons/widgetcontrols/NotifPanelController.qml
 singleton CheatSheetController 1.0 singletons/widgetcontrols/CheatSheetController.qml

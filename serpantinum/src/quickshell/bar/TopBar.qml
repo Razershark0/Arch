@@ -66,7 +66,7 @@ Item {
     property var defaultModuleSettings: {
         "left": ["left", "workspaces"],
         "center": ["timedate", "media"],
-        "right": ["sysmon", "wifi", "bt", "bat", "power"]
+        "right": ["sysmon", "wifi", "bt", "bat", "notif", "power"]
     }
 
     function parseModuleSettings(ms) {
@@ -188,6 +188,7 @@ Item {
     property real wWifi: isModuleActive("wifi") ? (wifiWidget.targetWidth !== undefined ? wifiWidget.targetWidth : wifiWidget.width) : 0
     property real wBt: isModuleActive("bt") ? (btWidget.targetWidth !== undefined ? btWidget.targetWidth : btWidget.width) : 0
     property real wBat: isModuleActive("bat") ? (batWidget.targetWidth !== undefined ? batWidget.targetWidth : batWidget.width) : 0
+    property real wNotif: isModuleActive("notif") ? (notifWidget.targetWidth !== undefined ? notifWidget.targetWidth : notifWidget.width) : 0
     property real wPower: isModuleActive("power") ? (powerWidget.targetWidth !== undefined ? powerWidget.targetWidth : powerWidget.width) : 0
     property real wTimedate: isModuleActive("timedate") ? (timeDateWidget.targetWidth !== undefined ? timeDateWidget.targetWidth : timeDateWidget.width) : 0
 
@@ -199,6 +200,7 @@ Item {
         if (moduleId === "wifi") return wWifi;
         if (moduleId === "bt") return wBt;
         if (moduleId === "bat") return wBat;
+        if (moduleId === "notif") return wNotif;
         if (moduleId === "power") return wPower;
         if (moduleId === "timedate" || moduleId === "time" || moduleId === "clock") return wTimedate;
         return 0;
@@ -385,6 +387,7 @@ Item {
         if (id === "wifi") return wifiWidget;
         if (id === "bt") return btWidget;
         if (id === "bat") return batWidget;
+        if (id === "notif") return notifWidget;
         if (id === "power") return powerWidget;
         if (id === "timedate" || id === "time" || id === "clock") return timeDateWidget;
         return null;
@@ -400,6 +403,7 @@ Item {
         else if (widgetName === "wifi") return wifiWidget.wifiPill ? wifiWidget.wifiPill : wifiWidget;
         else if (widgetName === "bt") return btWidget.btPill ? btWidget.btPill : btWidget;
         else if (widgetName === "battery" || widgetName === "bat") return batWidget.batPill ? batWidget.batPill : batWidget;
+        else if (widgetName === "notif" || widgetName === "notifications") return notifWidget.notifButton ? notifWidget.notifButton : notifWidget;
         else if (widgetName === "power") return powerWidget.powerButton ? powerWidget.powerButton : powerWidget;
         else if (widgetName === "system" || widgetName === "pills") return systemWidget;
         return null;
@@ -801,6 +805,29 @@ Item {
         }
     }
 
+    NotifWidget {
+        id: notifWidget
+        z: 1
+        x: targetX
+        y: contentWrapper.getModuleY(notifWidget)
+        visible: contentWrapper.isModuleActive("notif")
+        barWindow: contentWrapper.barWindow
+        isSolid: contentWrapper.isSolid || contentWrapper.isFill
+        distinctPills: contentWrapper.distinctPills
+        moduleActive: contentWrapper.isModuleActive("notif")
+        isGrouped: contentWrapper.isModuleGrouped("notif")
+        targetX: contentWrapper.getModuleX("notif", contentWrapper.layoutState)
+
+        Behavior on opacity {
+            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on x {
+            enabled: contentWrapper.layoutAnimationsEnabled
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+    }
+
     PowerWidget {
         id: powerWidget
         z: 1
@@ -831,7 +858,7 @@ Item {
         property alias batPill: batWidget.batPill
 
         function getBounds() {
-            let pills = [sysMonWidget, wifiWidget, btWidget, batWidget, powerWidget];
+            let pills = [sysMonWidget, wifiWidget, btWidget, batWidget, notifWidget, powerWidget];
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
             let found = false;
             for (let i = 0; i < pills.length; i++) {

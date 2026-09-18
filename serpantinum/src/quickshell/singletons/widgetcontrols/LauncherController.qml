@@ -66,6 +66,7 @@ Item {
         BtPanelController.hide();
         BatPanelController.hide();
         SystemPanelController.hide();
+        NotifPanelController.hide();
         let target = getScreen(scr);
         if (target !== null && target !== undefined) {
             controller.screen = target;

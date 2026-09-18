@@ -21,6 +21,7 @@ ShellRoot {
     WifiPanel {}
     BtPanel {}
     BatPanel {}
+    NotifPanel {}
 
     Lock {}
     Idle {}

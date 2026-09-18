@@ -102,6 +102,17 @@ PanelWindow {
                 return;
             }
 
+            if (cmd === "notifpanel" || targetWidget === "notifpanel") {
+                if (cmd === "close") {
+                    NotifPanelController.hide();
+                } else if (cmd === "open") {
+                    NotifPanelController.show();
+                } else {
+                    NotifPanelController.toggle();
+                }
+                return;
+            }
+
             if (cmd === "cheatsheet" || targetWidget === "cheatsheet") {
                 if (cmd === "close") {
                     CheatSheetController.hide();
