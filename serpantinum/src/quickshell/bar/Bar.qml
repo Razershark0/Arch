@@ -274,7 +274,7 @@ Variants {
             Timer { interval: 400; running: true; onTriggered: barWindow.isDataReady = true }
 
             property real systemPillWidth: contentWrapper.systemPillWidth
-            property real pillBottomY: baseOffsetY + barHeight
+            property real pillBottomY: barHeight
 
             Binding { target: WifiPanelController; property: "panelWidth"; value: barWindow.systemPillWidth }
             Binding { target: WifiPanelController; property: "topOffset"; value: barWindow.pillBottomY }
