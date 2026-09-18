@@ -1307,7 +1307,11 @@ PanelWindow {
                                                     let ic = model.icon || "";
                                                     if (!ic) return "";
                                                     if (ic.startsWith("file://") || ic.startsWith("image://") || ic.startsWith("http://") || ic.startsWith("https://")) return ic;
-                                                    return ic.startsWith("/") ? "file://" + ic : "image://icon/" + ic;
+                                                    if (ic.startsWith("/")) return "file://" + ic;
+                                                    // image://icon reports a missing icon as a loaded pink/black
+                                                    // test image, so look the name up first and fall back to the
+                                                    // placeholder glyph when it doesn't resolve.
+                                                    return Quickshell.iconPath(ic, true);
                                                 }
 
                                                 sourceSize: Qt.size(64, 64)
@@ -1333,7 +1337,10 @@ PanelWindow {
                                                     if (model.isCommand) return "󰆍";
                                                     return "󰵆";
                                                 }
-                                                font.family: ThemeBackend.fontFamily
+                                                // The base font has no glyph here, so Qt falls back to the
+                                                // mono Nerd Font, whose glyphs are wider than their advance
+                                                // and sit right of center. The Propo variant fits its advance.
+                                                font.family: "Iosevka Nerd Font Propo"
                                                 font.pixelSize: launcherWindow.s(16)
                                                 color: delegateRoot.isSelected ? ThemeBackend.mauve : ThemeBackend.subtext0
                                                 verticalAlignment: Text.AlignVCenter
