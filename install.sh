@@ -110,6 +110,12 @@ EOF
     echo 'FILES+=(/etc/udev/rules.d/90-backlight-full-at-boot.rules)' \
         | sudo tee /etc/mkinitcpio.conf.d/backlight-full.conf >/dev/null
 
+    # Load the Intel GPU driver inside the initramfs, so Plymouth starts on the real
+    # display instead of the firmware framebuffer and then gets swapped mid-boot
+    # (that swap flashed console text and reset the backlight).
+    echo 'MODULES+=(i915)' \
+        | sudo tee /etc/mkinitcpio.conf.d/early-kms.conf >/dev/null
+
     sudo mkinitcpio -P
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 else
