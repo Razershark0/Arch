@@ -48,8 +48,8 @@ PanelWindow {
     Rectangle {
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: s(50)
-        anchors.rightMargin: s(10)
+        anchors.topMargin: SystemPanelController.topOffset + 6
+        anchors.rightMargin: 6
         width: SystemPanelController.panelWidth
         height: content.height + s(24)
         radius: s(10)
