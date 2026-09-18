@@ -45,12 +45,10 @@ playerctl
 python
 python-fonttools
 python-websockets
-qt5ct
 qt5-graphicaleffects
 qt5-quickcontrols
 qt5-quickcontrols2
 qt5-wayland
-qt6ct
 qt6-websockets
 quickshell
 ripgrep
