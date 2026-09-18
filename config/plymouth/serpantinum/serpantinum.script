@@ -1,5 +1,5 @@
 # Serpantinum boot / disk-unlock screen: the lock screen's look (dimmed
-# wallpaper, "Welcome <user>" box, password field with one dot per typed
+# wallpaper, "Passphrase" box, password field with one dot per typed
 # character). "Raze" is filled in by install.sh.
 #
 # The box and the field are each drawn as a left end, a right end and a
@@ -51,12 +51,13 @@ greeting_image = Image.Text("Welcome @USER@", 0.639, 0.494, 0.337, 1, "Iosevka N
 greeting = Sprite(greeting_image);
 greeting.SetOpacity(0);
 
-# --- hint and dots -----------------------------------------------------------------
-hint_image = Image.Text("Passphrase", 0.941, 0.890, 0.714, 0.4, "Iosevka Nerd Font 16");
-hint = Sprite(hint_image);
-hint.SetPosition(screen_w / 2 - hint_image.GetWidth() / 2,
-                 field_y + field_h / 2 - hint_image.GetHeight() / 2, 12);
-hint.SetOpacity(0);
+# --- title while asking for the disk passphrase (this is not a sign-in) ----------
+title_image = Image.Text("Passphrase", 0.639, 0.494, 0.337, 1, "Iosevka Nerd Font 22");
+title = Sprite(title_image);
+title.SetPosition(screen_w / 2 - title_image.GetWidth() / 2, box_y + 24, 11);
+title.SetOpacity(0);
+
+# --- dots ---------------------------------------------------------------------------
 
 for (i = 0; i < max_dots; i++) {
     dots[i] = Sprite(dot_image);
@@ -96,25 +97,24 @@ fun draw() {
     field_m.SetPosition(local.field_x + field_cap, field_y, 11);
     field_r.SetPosition(local.field_x + local.field_w - field_cap, field_y, 11);
 
-    greeting.SetOpacity(local.o);
     if (mode == "password") {
+        greeting.SetOpacity(0);
+        title.SetOpacity(local.o);
         box_l.SetOpacity(local.o);
         box_m.SetOpacity(local.o);
         box_r.SetOpacity(local.o);
         field_l.SetOpacity(local.o);
         field_m.SetOpacity(local.o);
         field_r.SetOpacity(local.o);
-        greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2, box_y + 24, 11);
-        if (typed == 0) hint.SetOpacity(local.o);
-        else hint.SetOpacity(0);
     } else {
+        greeting.SetOpacity(local.o);
+        title.SetOpacity(0);
         box_l.SetOpacity(0);
         box_m.SetOpacity(0);
         box_r.SetOpacity(0);
         field_l.SetOpacity(0);
         field_m.SetOpacity(0);
         field_r.SetOpacity(0);
-        hint.SetOpacity(0);
         greeting.SetPosition(screen_w / 2 - greeting_image.GetWidth() / 2,
                              screen_h / 2 - greeting_image.GetHeight() / 2, 11);
     }

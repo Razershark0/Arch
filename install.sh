@@ -102,6 +102,14 @@ EOF
     # so re-run this step after one.)
     sudo sed -i '/echo.*"$message" | grub_quote/d' /etc/grub.d/10_linux
 
+    # Full backlight while the passphrase screen is up (the saved brightness is only
+    # restored after the disk unlocks, so until then the panel sits at the firmware level).
+    echo 'ACTION=="add", SUBSYSTEM=="backlight", ATTR{brightness}="$attr{max_brightness}"' \
+        | sudo tee /etc/udev/rules.d/90-backlight-full-at-boot.rules >/dev/null
+    sudo mkdir -p /etc/mkinitcpio.conf.d
+    echo 'FILES+=(/etc/udev/rules.d/90-backlight-full-at-boot.rules)' \
+        | sudo tee /etc/mkinitcpio.conf.d/backlight-full.conf >/dev/null
+
     sudo mkinitcpio -P
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 else
