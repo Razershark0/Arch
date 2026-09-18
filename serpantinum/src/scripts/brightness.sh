@@ -159,7 +159,12 @@ watch_brightness() {
         local old_pid
         old_pid="$(cat "$WATCH_PIDFILE" 2>/dev/null || true)"
         if [[ "$old_pid" =~ ^[0-9]+$ ]] && [[ "$old_pid" != "$$" ]]; then
-            if tr '\0' ' ' < "/proc/$old_pid/cmdline" 2>/dev/null | grep -q "brightness.sh"; then
+            # The watcher execs into inotifywait (same PID, new cmdline), so
+            # match either the pre-exec bash invocation or the post-exec
+            # inotifywait it becomes - matching "brightness.sh" alone never
+            # sees the common (already-exec'd) case, which is why old
+            # watchers kept leaking despite this check.
+            if tr '\0' ' ' < "/proc/$old_pid/cmdline" 2>/dev/null | grep -qE "brightness\.sh|inotifywait.*backlight"; then
                 kill "$old_pid" 2>/dev/null || true
                 pkill -P "$old_pid" 2>/dev/null || true
             fi

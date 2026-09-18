@@ -2,8 +2,6 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Bluetooth
-import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import "../../"
 
@@ -26,17 +24,12 @@ Item {
     readonly property real sysMicVolume: activeSource && activeSource.audio ? Math.round(activeSource.audio.volume * 100) : 0
     readonly property bool sysMicMuted: activeSource && activeSource.audio ? activeSource.audio.muted : false
 
-    readonly property bool wifiRadioEnabled: Networking.wifiEnabled
-    readonly property bool btRadioEnabled: Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
-    readonly property bool sysAirplane: !wifiRadioEnabled && !btRadioEnabled
-
     property int sysBrightness: 0
 
     property real lastVolume: -1
     property bool lastMuted: false
     property real lastMicVolume: -1
     property bool lastMicMuted: false
-    property bool lastAirplane: false
     property int lastCapsLock: -1
     property int lastNumLock: -1
     property int lastBrightness: -1
@@ -65,7 +58,6 @@ Item {
             controller.lastMuted = controller.sysMuted;
             controller.lastMicVolume = controller.sysMicVolume;
             controller.lastMicMuted = controller.sysMicMuted;
-            controller.lastAirplane = controller.sysAirplane;
             controller.lastBrightness = controller.sysBrightness;
             controller.isInitialized = true;
         }
@@ -100,14 +92,6 @@ Item {
         if (controller.lastMicMuted !== controller.sysMicMuted) {
             controller.lastMicMuted = controller.sysMicMuted;
             controller.show("mic");
-        }
-    }
-
-    onSysAirplaneChanged: {
-        if (!controller.isInitialized) return;
-        if (controller.lastAirplane !== controller.sysAirplane) {
-            controller.lastAirplane = controller.sysAirplane;
-            controller.show("airplane", controller.sysAirplane ? "on" : "off");
         }
     }
 

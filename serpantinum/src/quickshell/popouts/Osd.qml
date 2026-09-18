@@ -5,8 +5,6 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
-import Quickshell.Bluetooth
-import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import "../reusables"
 import "../"
@@ -40,13 +38,12 @@ PanelWindow {
     readonly property color micColor: Qt.lighter(ThemeBackend.mauve, 1.3)
     readonly property color capsColor: Qt.lighter(ThemeBackend.peach, 1.2)
     readonly property color numColor: Qt.lighter(ThemeBackend.sapphire, 1.4)
-    readonly property color airColor: Qt.lighter(ThemeBackend.red, 1.2)
 
     property string kind: OsdController.kind
     property int briVal: OsdController.briVal
     property string stateVal: OsdController.stateVal
 
-    readonly property bool isToggleKind: kind === "capslock" || kind === "numlock" || kind === "airplane"
+    readonly property bool isToggleKind: kind === "capslock" || kind === "numlock"
     readonly property bool isToggleActive: stateVal === "on" || stateVal === "true" || stateVal === "1"
 
     readonly property bool isToggleAllowed: {
@@ -54,7 +51,6 @@ PanelWindow {
         if (isVerticalLayout) return false;
         if (kind === "capslock") return showCapsLock;
         if (kind === "numlock") return showNumLock;
-        if (kind === "airplane") return showAirplane;
         return true;
     }
 
@@ -63,14 +59,12 @@ PanelWindow {
     readonly property color toggleActiveColor: {
         if (kind === "capslock") return capsColor;
         if (kind === "numlock") return numColor;
-        if (kind === "airplane") return airColor;
         return ThemeBackend.mauve;
     }
 
     readonly property string toggleTitle: {
         if (kind === "capslock") return "Caps Lock";
         if (kind === "numlock") return "Num Lock";
-        if (kind === "airplane") return "Airplane Mode";
         return "";
     }
 
@@ -112,7 +106,6 @@ PanelWindow {
         "orientation": "horizontal",
         "showCapsLock": true,
         "showNumLock": true,
-        "showAirplane": true,
         "attachToBar": true
     })
 
@@ -133,7 +126,6 @@ PanelWindow {
     readonly property real verticalPosition: osdSettings.verticalPosition !== undefined ? osdSettings.verticalPosition : 90
     readonly property bool showCapsLock: osdSettings.showCapsLock !== undefined ? osdSettings.showCapsLock : true
     readonly property bool showNumLock: osdSettings.showNumLock !== undefined ? osdSettings.showNumLock : true
-    readonly property bool showAirplane: osdSettings.showAirplane !== undefined ? osdSettings.showAirplane : true
 
     onAttachToBarChanged: OsdController.hide()
 
@@ -648,7 +640,7 @@ PanelWindow {
                     Layout.alignment: Qt.AlignHCenter
                     size: osdWindow.s(26)
                     iconOffsetX: {
-                        if (osdWindow.kind === "airplane" || osdWindow.kind === "capslock") return -1;
+                        if (osdWindow.kind === "capslock") return -1;
                         if (osdWindow.kind === "volume") return -1;
                         if (osdWindow.kind === "mic") return 0;
                         return -3;
@@ -663,8 +655,6 @@ PanelWindow {
                             return "󰬈";
                         } else if (osdWindow.kind === "numlock") {
                             return "󰎠";
-                        } else if (osdWindow.kind === "airplane") {
-                            return "󰀝";
                         } else {
                             return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                         }
@@ -692,14 +682,6 @@ PanelWindow {
                         } else if (osdWindow.kind === "mic") {
                             if (osdWindow.activeSource) {
                                 Audio.toggleMute(osdWindow.activeSource);
-                            }
-                        } else if (osdWindow.kind === "airplane") {
-                            if (osdWindow.isToggleActive) {
-                                Networking.wifiEnabled = true;
-                                if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
-                            } else {
-                                Networking.wifiEnabled = false;
-                                if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
                             }
                         } else if (osdWindow.kind === "brightness") {
                             briCmdThrottle.stop();
@@ -807,7 +789,7 @@ PanelWindow {
                         size: osdWindow.s(30)
                         cornerRadius: osdWindow.s(8)
                         iconOffsetX: {
-                            if (osdWindow.kind === "airplane" || osdWindow.kind === "capslock") return -1;
+                            if (osdWindow.kind === "capslock") return -1;
                             if (osdWindow.kind === "volume") return -1;
                             if (osdWindow.kind === "mic") return 0;
                             return -3;
@@ -821,8 +803,6 @@ PanelWindow {
                                 return "󰬈";
                             } else if (osdWindow.kind === "numlock") {
                                 return "󰎠";
-                            } else if (osdWindow.kind === "airplane") {
-                                return "󰀝";
                             } else {
                                 return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                             }
@@ -850,14 +830,6 @@ PanelWindow {
                             } else if (osdWindow.kind === "mic") {
                                 if (osdWindow.activeSource) {
                                     Audio.toggleMute(osdWindow.activeSource);
-                                }
-                            } else if (osdWindow.kind === "airplane") {
-                                if (osdWindow.isToggleActive) {
-                                    Networking.wifiEnabled = true;
-                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
-                                } else {
-                                    Networking.wifiEnabled = false;
-                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
                                 }
                             } else if (osdWindow.kind === "brightness") {
                                 briCmdThrottle.stop();
@@ -902,19 +874,6 @@ PanelWindow {
                         textFontSize: osdWindow.s(11)
                         accentColor: osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.surface1
                         textColor: osdWindow.isToggleActive ? ThemeBackend.base : ThemeBackend.subtext0
-
-                        onClicked: {
-                            OsdController.restartTimer();
-                            if (osdWindow.kind === "airplane") {
-                                if (osdWindow.isToggleActive) {
-                                    Networking.wifiEnabled = true;
-                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = true;
-                                } else {
-                                    Networking.wifiEnabled = false;
-                                    if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
-                                }
-                            }
-                        }
                     }
                 }
 

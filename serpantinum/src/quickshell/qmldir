@@ -6,12 +6,16 @@ Launcher 1.0 launcher/Launcher.qml
 ScreenshotOverlay 1.0 screenshot/ScreenshotOverlay.qml
 Lock 1.0 lock/Lock.qml
 Idle 1.0 idle/Idle.qml
+CheatSheet 1.0 cheatsheet/CheatSheet.qml
 
 Osd 1.0 popouts/Osd.qml
 PopoutManager 1.0 popouts/PopoutManager.qml
 
 NotificationPopups 1.0 notifications/NotificationPopups.qml
 SystemPanel 1.0 popouts/SystemPanel.qml
+WifiPanel 1.0 popouts/WifiPanel.qml
+BtPanel 1.0 popouts/BtPanel.qml
+BatPanel 1.0 popouts/BatPanel.qml
 singleton NotificationManager 1.0 notifications/NotificationManager.qml
 
 
@@ -33,3 +37,7 @@ singleton ClipboardController 1.0 singletons/widgetcontrols/ClipboardController.
 singleton LauncherController 1.0 singletons/widgetcontrols/LauncherController.qml
 singleton OsdController 1.0 singletons/widgetcontrols/OsdController.qml
 singleton SystemPanelController 1.0 singletons/widgetcontrols/SystemPanelController.qml
+singleton WifiPanelController 1.0 singletons/widgetcontrols/WifiPanelController.qml
+singleton BtPanelController 1.0 singletons/widgetcontrols/BtPanelController.qml
+singleton BatPanelController 1.0 singletons/widgetcontrols/BatPanelController.qml
+singleton CheatSheetController 1.0 singletons/widgetcontrols/CheatSheetController.qml

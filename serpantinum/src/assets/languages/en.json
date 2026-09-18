@@ -482,9 +482,6 @@
       "numlock": {
         "title": "Show on Num Lock"
       },
-      "airplane": {
-        "title": "Show on Airplane Mode"
-      },
       "attach_bar": {
         "title": "Attach to the bar in solid/fill style",
         "desc": "Snap OSD popups to the status bar in solid or fill mode. When disabled, the OSD always stays in the configured position."

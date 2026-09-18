@@ -18,7 +18,15 @@ ShellRoot {
     PopoutManager {}
     NotificationPopups {}
     SystemPanel {}
+    WifiPanel {}
+    BtPanel {}
+    BatPanel {}
 
     Lock {}
     Idle {}
+
+    Loader {
+        active: CheatSheetController.isVisible
+        sourceComponent: CheatSheet {}
+    }
 }

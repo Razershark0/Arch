@@ -68,6 +68,50 @@ PanelWindow {
                 }
                 return;
             }
+
+            if (cmd === "wifipanel" || targetWidget === "wifipanel") {
+                if (cmd === "close") {
+                    WifiPanelController.hide();
+                } else if (cmd === "open") {
+                    WifiPanelController.show();
+                } else {
+                    WifiPanelController.toggle();
+                }
+                return;
+            }
+
+            if (cmd === "btpanel" || targetWidget === "btpanel") {
+                if (cmd === "close") {
+                    BtPanelController.hide();
+                } else if (cmd === "open") {
+                    BtPanelController.show();
+                } else {
+                    BtPanelController.toggle();
+                }
+                return;
+            }
+
+            if (cmd === "batpanel" || targetWidget === "batpanel") {
+                if (cmd === "close") {
+                    BatPanelController.hide();
+                } else if (cmd === "open") {
+                    BatPanelController.show();
+                } else {
+                    BatPanelController.toggle();
+                }
+                return;
+            }
+
+            if (cmd === "cheatsheet" || targetWidget === "cheatsheet") {
+                if (cmd === "close") {
+                    CheatSheetController.hide();
+                } else if (cmd === "open") {
+                    CheatSheetController.show();
+                } else {
+                    CheatSheetController.toggle();
+                }
+                return;
+            }
         }
     }
 }

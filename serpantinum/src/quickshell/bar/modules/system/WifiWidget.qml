@@ -148,10 +148,6 @@ Rectangle {
             target: Networking
             ignoreUnknownSignals: true
             function onWifiEnabledChanged() { wifiWidgetRoot.updateNetworkData(); }
-            function onDevicesChanged() {
-                wifiWidgetRoot.findDevices();
-                wifiWidgetRoot.updateNetworkData();
-            }
         }
 
         Connections {
@@ -290,7 +286,7 @@ Rectangle {
             transform: Translate { y: wifiPill.initAnimTrigger ? 0 : barWindow.s(15); Behavior on y { NumberAnimation { duration: 620; easing.type: Easing.OutQuint } } }
             Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
 
-            onClicked: Quickshell.execDetached(["nm-connection-editor"])
+            onClicked: WifiPanelController.toggle()
         }
     }
 }

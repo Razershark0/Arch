@@ -273,6 +273,24 @@ Variants {
             property bool isDataReady: fastPollerLoaded
             Timer { interval: 400; running: true; onTriggered: barWindow.isDataReady = true }
 
+            property real systemPillWidth: contentWrapper.systemPillWidth
+            property real pillBottomY: baseOffsetY + barHeight
+            property real seamlessX: contentWrapper.seamlessX + margins.left
+            property real seamlessWidth: contentWrapper.seamlessWidth
+
+            Binding { target: WifiPanelController; property: "panelWidth"; value: barWindow.systemPillWidth }
+            Binding { target: WifiPanelController; property: "topOffset"; value: barWindow.pillBottomY }
+            Binding { target: WifiPanelController; property: "seamlessX"; value: barWindow.seamlessX }
+            Binding { target: WifiPanelController; property: "seamlessWidth"; value: barWindow.seamlessWidth }
+            Binding { target: BtPanelController; property: "panelWidth"; value: barWindow.systemPillWidth }
+            Binding { target: BtPanelController; property: "topOffset"; value: barWindow.pillBottomY }
+            Binding { target: BtPanelController; property: "seamlessX"; value: barWindow.seamlessX }
+            Binding { target: BtPanelController; property: "seamlessWidth"; value: barWindow.seamlessWidth }
+            Binding { target: BatPanelController; property: "panelWidth"; value: barWindow.systemPillWidth }
+            Binding { target: BatPanelController; property: "topOffset"; value: barWindow.pillBottomY }
+            Binding { target: BatPanelController; property: "seamlessX"; value: barWindow.seamlessX }
+            Binding { target: BatPanelController; property: "seamlessWidth"; value: barWindow.seamlessWidth }
+
             TopBar {
                 id: contentWrapper
                 barWindow: barWindow
