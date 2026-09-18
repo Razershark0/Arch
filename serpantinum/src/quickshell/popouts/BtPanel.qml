@@ -297,7 +297,7 @@ PanelWindow {
                                             }
                                             font.family: ThemeBackend.fontFamily
                                             font.pixelSize: panelWindow.s(10)
-                                            color: "#A37E56"
+                                            color: "#F0E3B6"
                                         }
 
                                         RowLayout {

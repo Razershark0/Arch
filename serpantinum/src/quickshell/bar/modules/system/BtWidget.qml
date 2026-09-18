@@ -195,7 +195,7 @@ Rectangle {
             buttonText: btDevice
             textFontSize: barWindow ? barWindow.s(btWidgetRoot.isCompact ? 11 : 12) : (btWidgetRoot.isCompact ? 11 : 12)
             accentColor: btWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
-            textColor: btWidgetRoot.isCompact ? Qt.lighter("#A37E56", 1.05) : "#A37E56"
+            textColor: btWidgetRoot.isCompact ? Qt.lighter("#F0E3B6", 1.05) : "#F0E3B6"
 
             property real targetWidth: isDesktop ? 0 : implicitWidth
             width: targetWidth

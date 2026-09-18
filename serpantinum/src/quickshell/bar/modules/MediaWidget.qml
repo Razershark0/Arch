@@ -118,7 +118,7 @@ Rectangle {
                             text: "󰎈"
                             font.family: ThemeBackend.fontFamily
                             font.pixelSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 13 : 14) : (mediaWidgetRoot.isCompact ? 13 : 14)
-                            color: mediaWidgetRoot.isCompact ? ThemeBackend.text : ThemeBackend.subtext0
+                            color: "#F0E3B6"
                             visible: !isMediaActive || !MprisController.artUrl
                         }
 
@@ -194,7 +194,7 @@ Rectangle {
                                         font.family: ThemeBackend.fontFamily
                                         font.weight: Font.Black
                                         font.pixelSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 11 : 12) : (mediaWidgetRoot.isCompact ? 11 : 12)
-                                        color: ThemeBackend.text
+                                        color: "#F0E3B6"
 
                                         onTextChanged: {
                                             marqueeContainer.x = 0;
@@ -212,7 +212,7 @@ Rectangle {
                                         font.family: ThemeBackend.fontFamily
                                         font.weight: Font.Black
                                         font.pixelSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 11 : 12) : (mediaWidgetRoot.isCompact ? 11 : 12)
-                                        color: ThemeBackend.text
+                                        color: "#F0E3B6"
                                         visible: titleTextMain.implicitWidth > titleClipRect.width
                                     }
                                 }
@@ -244,7 +244,7 @@ Rectangle {
                             font.family: ThemeBackend.fontFamily
                             font.weight: Font.Black
                             font.pixelSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 9 : 10) : (mediaWidgetRoot.isCompact ? 9 : 10)
-                            color: mediaWidgetRoot.isCompact ? ThemeBackend.overlay2 : ThemeBackend.subtext0
+                            color: "#F0E3B6"
                             width: parent.width
                             elide: Text.ElideRight
                             visible: isMediaActive
@@ -275,7 +275,7 @@ Rectangle {
                     buttonIcon: "󰒮"
                     iconFontSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 19 : 20) : (mediaWidgetRoot.isCompact ? 19 : 20)
                     accentColor: "transparent"
-                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : (mediaWidgetRoot.isCompact ? ThemeBackend.subtext0 : ThemeBackend.overlay2)
+                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : "#F0E3B6"
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: if (player && player.canGoPrevious) player.previous()
                 }
@@ -288,7 +288,7 @@ Rectangle {
                     buttonIcon: (isMediaActive && MprisController.isPlaying) ? "󰏤" : "󰐊"
                     iconFontSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 22 : 23) : (mediaWidgetRoot.isCompact ? 22 : 23)
                     accentColor: "transparent"
-                    textColor: isHoveredOrHighlighted ? "#A37E56" : (mediaWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.text, 1.1) : ThemeBackend.text)
+                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : "#F0E3B6"
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: if (player && player.canTogglePlaying) player.togglePlaying()
                 }
@@ -301,7 +301,7 @@ Rectangle {
                     buttonIcon: "󰒭"
                     iconFontSize: barWindow ? barWindow.s(mediaWidgetRoot.isCompact ? 19 : 20) : (mediaWidgetRoot.isCompact ? 19 : 20)
                     accentColor: "transparent"
-                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : (mediaWidgetRoot.isCompact ? ThemeBackend.subtext0 : ThemeBackend.overlay2)
+                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : "#F0E3B6"
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: if (player && player.canGoNext) player.next()
                 }

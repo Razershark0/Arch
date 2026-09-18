@@ -30,7 +30,7 @@ Rectangle {
     property color batDynamicColor: ThemeBackend.overlay1
 
     property real targetX: 0
-    property bool showLayout: false
+    property bool showLayout: moduleActive && (barWindow ? (barWindow.isStartupReady && barWindow.isDataReady) : true)
     property alias batPill: batPill
 
     x: targetX
@@ -53,20 +53,9 @@ Rectangle {
     visible: opacity > 0
     Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
 
+    // Nothing draws the wave any more, and an endless animation here kept the
+    // whole bar repainting every frame (~10% CPU idle), so it stays parked.
     property real globalWavePhase: 0.0
-    NumberAnimation on globalWavePhase {
-        from: 0
-        to: Math.PI * 2
-        duration: batWidgetRoot.isCharging ? 1800 : 3600
-        loops: Animation.Infinite
-        running: batWidgetRoot.showLayout && batWidgetRoot.moduleActive
-    }
-
-    Timer {
-        running: batWidgetRoot.moduleActive && barWindow && barWindow.isStartupReady && barWindow.isDataReady
-        interval: 100
-        onTriggered: batWidgetRoot.showLayout = true
-    }
 
     transform: Translate {
         x: batWidgetRoot.showLayout ? 0 : (barWindow ? barWindow.s(60) : 60)
@@ -80,7 +69,7 @@ Rectangle {
 
         Rectangle {
             id: batPill
-            property bool initAnimTrigger: false
+            property bool initAnimTrigger: batWidgetRoot.showLayout
 
             property real value: batWidgetRoot.isDesktop ? 0.0 : (UPower.displayDevice.ready ? UPower.displayDevice.percentage : 0.0)
             property real animValue: value
@@ -102,12 +91,6 @@ Rectangle {
             border.width: 0
             clip: true
 
-            Timer {
-                running: batWidgetRoot.moduleActive && batWidgetRoot.showLayout && !batPill.initAnimTrigger
-                interval: 150
-                onTriggered: batPill.initAnimTrigger = true
-            }
-
             opacity: initAnimTrigger ? 1.0 : 0.0
             transform: Translate {
                 y: batPill.initAnimTrigger ? 0 : (barWindow ? barWindow.s(15) : 15)
@@ -124,7 +107,7 @@ Rectangle {
                     text: batWidgetRoot.batIcon
                     font.family: ThemeBackend.fontFamily
                     font.pixelSize: batWidgetRoot.isDesktop ? (barWindow ? barWindow.s(batWidgetRoot.isCompact ? 15 : 16) : (batWidgetRoot.isCompact ? 15 : 16)) : (barWindow ? barWindow.s(batWidgetRoot.isCompact ? 12 : 13.5) : (batWidgetRoot.isCompact ? 12 : 13.5))
-                    color: "#A37E56"
+                    color: "#F0E3B6"
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -134,7 +117,7 @@ Rectangle {
                     font.family: ThemeBackend.fontFamily
                     font.pixelSize: barWindow ? barWindow.s(batWidgetRoot.isCompact ? 11 : 12.6) : (batWidgetRoot.isCompact ? 11 : 12.6)
                     font.bold: true
-                    color: "#A37E56"
+                    color: "#F0E3B6"
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

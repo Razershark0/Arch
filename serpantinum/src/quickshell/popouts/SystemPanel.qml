@@ -67,16 +67,6 @@ PanelWindow {
             width: parent.width - s(24)
             spacing: s(10)
 
-            Text {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin: s(4)
-                text: "Power"
-                font.family: ThemeBackend.fontFamily
-                font.weight: Font.Bold
-                font.pixelSize: s(15)
-                color: "#F0E3B6"
-            }
-
             FillButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: s(42)

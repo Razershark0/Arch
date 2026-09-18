@@ -293,7 +293,7 @@ Rectangle {
         id: activeHighlight
         z: 3
         radius: barWindow.s(workspacesWidgetRoot.isCompact ? 7 : 8)
-        color: workspacesWidgetRoot.isCompact ? Qt.lighter("#A37E56", 1.05) : "#A37E56"
+        color: workspacesWidgetRoot.isCompact ? Qt.lighter("#F0E3B6", 1.05) : "#F0E3B6"
 
         property int prevIdx: 0
         property int curIdx: workspacesWidgetRoot.activeIndex

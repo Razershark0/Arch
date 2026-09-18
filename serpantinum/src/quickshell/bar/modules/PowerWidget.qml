@@ -20,7 +20,7 @@ Rectangle {
     property alias powerButton: powerButton
 
     property real targetX: 0
-    property bool showLayout: barWindow ? Boolean(barWindow.isStartupReady) : true
+    property bool showLayout: moduleActive && (barWindow ? (barWindow.isStartupReady && barWindow.isDataReady) : true)
 
     x: targetX
     Behavior on x {
@@ -47,7 +47,7 @@ Rectangle {
 
     transform: Translate {
         x: powerWidgetRoot.showLayout ? 0 : (barWindow ? barWindow.s(60) : 60)
-        Behavior on x { NumberAnimation { duration: 750; easing.type: Easing.OutQuint } }
+        Behavior on x { NumberAnimation { duration: 800; easing.type: Easing.OutQuint } }
     }
 
     Row {
@@ -70,7 +70,7 @@ Rectangle {
             buttonIcon: "󰐥"
             iconFontSize: barWindow ? barWindow.s(powerWidgetRoot.isCompact ? 18 : 20) : (powerWidgetRoot.isCompact ? 18 : 20)
             accentColor: powerWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
-            textColor: isHoveredOrHighlighted ? ThemeBackend.red : "#A37E56"
+            textColor: isHoveredOrHighlighted ? ThemeBackend.red : "#F0E3B6"
 
             opacity: powerWidgetRoot.showLayout ? 1.0 : 0.0
             transform: Translate {

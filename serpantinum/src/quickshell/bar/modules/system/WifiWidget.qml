@@ -276,7 +276,7 @@ Rectangle {
             buttonText: showEthernet ? ethStatus : ((isWifiOn ? (wifiSsid !== "" ? wifiSsid : "On") : "Off"))
             textFontSize: barWindow ? barWindow.s(wifiWidgetRoot.isCompact ? 11 : 12) : (wifiWidgetRoot.isCompact ? 11 : 12)
             accentColor: wifiWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
-            textColor: wifiWidgetRoot.isCompact ? Qt.lighter("#A37E56", 1.05) : "#A37E56"
+            textColor: wifiWidgetRoot.isCompact ? Qt.lighter("#F0E3B6", 1.05) : "#F0E3B6"
 
             property real targetWidth: implicitWidth
             width: targetWidth

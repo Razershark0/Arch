@@ -18,7 +18,7 @@ Rectangle {
     property bool isGrouped: false
     property bool isCompact: isGrouped || (isSolid && distinctPills)
     property real targetX: 0
-    property bool showLayout: false
+    property bool showLayout: moduleActive && (barWindow ? (barWindow.isStartupReady && barWindow.isDataReady) : true)
 
     property bool isSysVisible: moduleActive && showLayout
 
@@ -59,6 +59,17 @@ Rectangle {
     // and continuously counter the widget's own x against that snapshot so
     // the icon never visually moves.
     property real restingRightEdge: 0
+    // Until the first settled snapshot, the icon just follows the widget's
+    // right edge like the other bar widgets do, so it doesn't sit at a stale
+    // position and jump once the snapshot timer finally fires.
+    property bool restSettled: false
+
+    function syncRestingEdge() {
+        if (!restSettled && !expanded) restingRightEdge = x + width;
+    }
+
+    onXChanged: syncRestingEdge()
+    onWidthChanged: syncRestingEdge()
 
     Component.onCompleted: {
         updateSubscription();
@@ -68,7 +79,10 @@ Rectangle {
     Timer {
         id: captureRestTimer
         interval: 900
-        onTriggered: sysMonWidgetRoot.restingRightEdge = sysMonWidgetRoot.x + sysMonWidgetRoot.width
+        onTriggered: {
+            sysMonWidgetRoot.restingRightEdge = sysMonWidgetRoot.x + sysMonWidgetRoot.width;
+            sysMonWidgetRoot.restSettled = true;
+        }
     }
 
     onExpandedChanged: {
@@ -88,12 +102,6 @@ Rectangle {
     visible: opacity > 0
     Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
 
-    Timer {
-        running: sysMonWidgetRoot.moduleActive && barWindow && barWindow.isStartupReady && barWindow.isDataReady
-        interval: 100
-        onTriggered: sysMonWidgetRoot.showLayout = true
-    }
-
     transform: Translate {
         x: sysMonWidgetRoot.showLayout ? 0 : (barWindow ? barWindow.s(60) : 60)
         Behavior on x { NumberAnimation { duration: 800; easing.type: Easing.OutQuint } }
@@ -105,7 +113,7 @@ Rectangle {
         property string textVal: ""
         property string icon: ""
         property color accentColor: ThemeBackend.mauve
-        property bool initAnimTrigger: false
+        property bool initAnimTrigger: sysMonWidgetRoot.showLayout
 
         height: sysMonWidgetRoot.pillHeight
         width: sysMonWidgetRoot.pillWidth
@@ -113,12 +121,6 @@ Rectangle {
         color: sysMonWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
         border.width: 0
         clip: true
-
-        Timer {
-            running: sysMonWidgetRoot.moduleActive && sysMonWidgetRoot.showLayout && !initAnimTrigger
-            interval: 150
-            onTriggered: initAnimTrigger = true
-        }
 
         opacity: initAnimTrigger ? 1.0 : 0.0
         transform: Translate {
@@ -136,7 +138,7 @@ Rectangle {
                 text: icon
                 font.family: ThemeBackend.fontFamily
                 font.pixelSize: barWindow ? barWindow.s(sysMonWidgetRoot.isCompact ? 13.5 : 14.5) : (sysMonWidgetRoot.isCompact ? 13.5 : 14.5)
-                color: "#A37E56"
+                color: "#F0E3B6"
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -145,7 +147,7 @@ Rectangle {
                 font.family: ThemeBackend.fontFamily
                 font.pixelSize: barWindow ? barWindow.s(sysMonWidgetRoot.isCompact ? 12 : 13) : (sysMonWidgetRoot.isCompact ? 12 : 13)
                 font.bold: true
-                color: "#A37E56"
+                color: "#F0E3B6"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -164,12 +166,19 @@ Rectangle {
         color: sysMonWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
         border.width: 0
 
+        opacity: sysMonWidgetRoot.showLayout ? 1.0 : 0.0
+        transform: Translate {
+            y: sysMonWidgetRoot.showLayout ? 0 : (barWindow ? barWindow.s(15) : 15)
+            Behavior on y { NumberAnimation { duration: 620; easing.type: Easing.OutQuint } }
+        }
+        Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
+
         Text {
             anchors.centerIn: parent
             text: "\u{F0379}"
             font.family: ThemeBackend.fontFamily
             font.pixelSize: barWindow ? barWindow.s(sysMonWidgetRoot.isCompact ? 14 : 15) : (sysMonWidgetRoot.isCompact ? 14 : 15)
-            color: "#A37E56"
+            color: "#F0E3B6"
         }
 
         MouseArea {

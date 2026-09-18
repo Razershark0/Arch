@@ -72,7 +72,7 @@ Rectangle {
             buttonIcon: "󰍉"
             iconFontSize: barWindow ? barWindow.s(leftWidgetRoot.isCompact ? 20 : 22) : (leftWidgetRoot.isCompact ? 20 : 22)
             accentColor: "transparent"
-            textColor: isHoveredOrHighlighted ? ThemeBackend.text : "#A37E56"
+            textColor: isHoveredOrHighlighted ? ThemeBackend.text : "#F0E3B6"
 
             opacity: leftWidgetRoot.showLayout ? 1.0 : 0.0
             transform: Translate {
