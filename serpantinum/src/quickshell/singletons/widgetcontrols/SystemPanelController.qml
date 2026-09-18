@@ -7,6 +7,7 @@ Item {
 
     property bool isVisible: false
     property real topOffset: 0
+    property real panelWidth: 320
 
     function show() {
         WifiPanelController.hide();

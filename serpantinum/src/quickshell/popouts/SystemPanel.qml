@@ -50,7 +50,7 @@ PanelWindow {
         anchors.right: parent.right
         anchors.topMargin: s(50)
         anchors.rightMargin: s(10)
-        width: content.width + s(24)
+        width: SystemPanelController.panelWidth
         height: content.height + s(24)
         radius: s(10)
         color: "#110915"
@@ -64,7 +64,7 @@ PanelWindow {
         ColumnLayout {
             id: content
             anchors.centerIn: parent
-            width: s(240)
+            width: parent.width - s(24)
             spacing: s(10)
 
             Text {
