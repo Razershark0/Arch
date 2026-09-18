@@ -62,6 +62,9 @@ Item {
     }
 
     function show(scr) {
+        WifiPanelController.hide();
+        BtPanelController.hide();
+        BatPanelController.hide();
         let target = getScreen(scr);
         if (target !== null && target !== undefined) {
             controller.screen = target;

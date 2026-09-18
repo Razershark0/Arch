@@ -8,8 +8,6 @@ Item {
     property bool isVisible: false
     property real panelWidth: 320
     property real topOffset: 0
-    property real seamlessX: 0
-    property real seamlessWidth: 0
 
     function show() {
         BtPanelController.hide();

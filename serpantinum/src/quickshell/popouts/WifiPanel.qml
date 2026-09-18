@@ -34,9 +34,9 @@ PanelWindow {
 
     Item {
         id: barHole
-        x: WifiPanelController.seamlessX
+        x: 0
         y: 0
-        width: WifiPanelController.seamlessWidth
+        width: panelWindow.width
         height: WifiPanelController.topOffset + 6
     }
 

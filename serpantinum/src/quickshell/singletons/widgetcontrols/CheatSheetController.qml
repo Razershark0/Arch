@@ -1,12 +1,21 @@
 pragma Singleton
 import QtQuick
+import "../../"
 
 Item {
     id: controller
 
     property bool isVisible: false
 
-    function show() { controller.isVisible = true; }
+    function show() {
+        WifiPanelController.hide();
+        BtPanelController.hide();
+        BatPanelController.hide();
+        controller.isVisible = true;
+    }
     function hide() { controller.isVisible = false; }
-    function toggle() { controller.isVisible = !controller.isVisible; }
+    function toggle() {
+        if (controller.isVisible) hide();
+        else show();
+    }
 }

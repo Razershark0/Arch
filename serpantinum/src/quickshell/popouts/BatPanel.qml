@@ -34,9 +34,9 @@ PanelWindow {
 
     Item {
         id: barHole
-        x: BatPanelController.seamlessX
+        x: 0
         y: 0
-        width: BatPanelController.seamlessWidth
+        width: panelWindow.width
         height: BatPanelController.topOffset + 6
     }
 

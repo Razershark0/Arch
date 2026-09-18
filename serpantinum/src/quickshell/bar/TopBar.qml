@@ -638,16 +638,6 @@ Item {
 
     property real systemPillWidth: (groupBgRepeater.count > 0 && groupBgRepeater.itemAt(0)) ? groupBgRepeater.itemAt(0).width : 0
 
-    property var seamlessWidgets: [wifiWidget, btWidget, batWidget]
-    property real seamlessX: {
-        let xs = contentWrapper.seamlessWidgets.filter(w => w && w.visible && w.width > 0).map(w => w.x);
-        return xs.length > 0 ? Math.min(...xs) : 0;
-    }
-    property real seamlessWidth: {
-        let xs = contentWrapper.seamlessWidgets.filter(w => w && w.visible && w.width > 0).map(w => w.x + w.width);
-        return xs.length > 0 ? (Math.max(...xs) - contentWrapper.seamlessX) : 0;
-    }
-
     LeftWidget {
         id: leftWidget
         z: 1

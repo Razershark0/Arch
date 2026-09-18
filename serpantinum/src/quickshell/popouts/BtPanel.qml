@@ -34,9 +34,9 @@ PanelWindow {
 
     Item {
         id: barHole
-        x: BtPanelController.seamlessX
+        x: 0
         y: 0
-        width: BtPanelController.seamlessWidth
+        width: panelWindow.width
         height: BtPanelController.topOffset + 6
     }
 
