@@ -59,6 +59,14 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw --force enable
 sudo systemctl enable --now tlp
+
+echo "==> Capping battery charge at 80% (start recharging at 75%) to slow"
+echo "    wear -- this ThinkPad's battery was already down to 72% of its"
+echo "    design capacity at only 32 cycles from always charging to 100%..."
+sudo sed -i -E "s/^#?START_CHARGE_THRESH_BAT1=.*/START_CHARGE_THRESH_BAT1=75/" /etc/tlp.conf
+sudo sed -i -E "s/^#?STOP_CHARGE_THRESH_BAT1=.*/STOP_CHARGE_THRESH_BAT1=80/" /etc/tlp.conf
+sudo tlp start >/dev/null
+
 systemctl --user enable --now hyprpolkitagent
 # easyeffects doesn't actually ship a systemd user unit (confirmed via
 # `pacman -Ql easyeffects` -- no .service file at all); this has always
@@ -87,6 +95,17 @@ sed 's/^Name=Alacritty$/Name=Terminal/' /usr/share/applications/Alacritty.deskto
 
 echo "==> Hiding Calibre's bundled LRF viewer from the app launcher..."
 sudo rm -f /usr/share/applications/calibre-lrfviewer.desktop
+
+echo "==> Hiding hwloc's lstopo (pulled in as a dependency, not something we"
+echo "    use) from the app launcher (user-level override, hwloc itself stays"
+echo "    installed -- easyeffects/opencv depend on it)..."
+mkdir -p "$HOME/.local/share/applications"
+cat > "$HOME/.local/share/applications/lstopo.desktop" << 'DESKTOPEOF'
+[Desktop Entry]
+Name=Hardware Locality lstopo
+NoDisplay=true
+Type=Application
+DESKTOPEOF
 
 echo "==> Setting Hyprland to launch on tty1 login (no display manager)..."
 if ! grep -q "start-hyprland" "$HOME/.bash_profile" 2>/dev/null; then
