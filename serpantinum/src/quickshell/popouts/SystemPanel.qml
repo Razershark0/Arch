@@ -71,7 +71,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: s(42)
                 buttonText: "Lock"
-                buttonIcon: ""
+                buttonIcon: "󰌾"
                 accentColor: "#A37E56"
                 baseColor: ThemeBackend.surface0
                 textColor: ThemeBackend.text
@@ -82,7 +82,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: s(42)
                 buttonText: "Suspend"
-                buttonIcon: "ᶻ 𝗓 𝗓"
+                buttonIcon: "󰒲"
                 accentColor: ThemeBackend.blue
                 baseColor: ThemeBackend.surface0
                 textColor: ThemeBackend.text
@@ -104,7 +104,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: s(42)
                 buttonText: "Power Off"
-                buttonIcon: ""
+                buttonIcon: "󰐥"
                 accentColor: ThemeBackend.red
                 baseColor: ThemeBackend.surface0
                 textColor: ThemeBackend.text
