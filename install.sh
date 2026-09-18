@@ -68,11 +68,6 @@ sudo sed -i -E "s/^#?STOP_CHARGE_THRESH_BAT1=.*/STOP_CHARGE_THRESH_BAT1=80/" /et
 sudo tlp start >/dev/null
 
 systemctl --user enable --now hyprpolkitagent
-# easyeffects doesn't actually ship a systemd user unit (confirmed via
-# `pacman -Ql easyeffects` -- no .service file at all); this has always
-# silently no-op'd, including in the live autostart config, so it's
-# harmless -- just don't let it abort the script under set -e.
-systemctl --user enable --now easyeffects || true
 
 echo "==> Setting lid-close to suspend..."
 if ! grep -q "^HandleLidSwitch=suspend" /etc/systemd/logind.conf 2>/dev/null; then
