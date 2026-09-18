@@ -34,7 +34,6 @@ mpv
 nano
 neovim
 networkmanager
-network-manager-applet
 openssh
 openvpn
 pavucontrol
