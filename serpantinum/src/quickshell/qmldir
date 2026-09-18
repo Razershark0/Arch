@@ -43,3 +43,4 @@ singleton BtPanelController 1.0 singletons/widgetcontrols/BtPanelController.qml
 singleton BatPanelController 1.0 singletons/widgetcontrols/BatPanelController.qml
 singleton NotifPanelController 1.0 singletons/widgetcontrols/NotifPanelController.qml
 singleton CheatSheetController 1.0 singletons/widgetcontrols/CheatSheetController.qml
+singleton IdleController 1.0 singletons/widgetcontrols/IdleController.qml

@@ -99,7 +99,6 @@ Item {
     property bool idleEnabled: idleSettings && idleSettings.enabled !== undefined ? idleSettings.enabled : false
     property bool manualInhibit: idleSettings && idleSettings.manualInhibit !== undefined ? idleSettings.manualInhibit : false
     property bool isIdleSystemActive: idleEnabled && !manualInhibit
-    property bool isDimmed: false
     property bool isLocked: false
 
     property bool isMediaPlaying: {
@@ -193,6 +192,8 @@ Item {
         Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/lock.sh"]);
     }
 
+    // Same path as the manual lock (Mod+L): the lock screen fades in from a
+    // snapshot of the desktop.
     function performLock() {
         idleRoot.isLocked = true;
         idleRoot.lockSession();
@@ -214,12 +215,6 @@ Item {
         }
     }
 
-    function teardownVisualStates() {
-        if (idleRoot.isDimmed) {
-            idleRoot.isDimmed = false;
-        }
-    }
-
     function triggerWarning(actionObj) {
         if (!actionObj || !idleRoot.isActionPipelineValid(actionObj)) return;
         if (actionObj.warningCommand && actionObj.warningCommand.trim().length > 0) {
@@ -232,32 +227,18 @@ Item {
 
         let id = (actionObj.id || "").toLowerCase();
 
-        if (id === "dim") {
-            if (!idleRoot.isLocked) {
-                if (actionObj.beforeCommand && actionObj.beforeCommand.trim().length > 0) {
-                    idleRoot.runCmd(actionObj.beforeCommand);
-                }
-                idleRoot.isDimmed = true;
-                if (actionObj.command && actionObj.command.trim().length > 0) {
-                    idleRoot.runCmd(actionObj.command);
-                }
-            }
-            return;
-        }
-
-        idleRoot.teardownVisualStates();
+        // The dim stage (matrix over the wallpaper) is gone: the matrix now
+        // lives on the lock screen itself, so there is nothing to dim to.
+        if (id === "dim") return;
 
         if (id === "lock") {
             if (actionObj.beforeCommand && actionObj.beforeCommand.trim().length > 0) {
                 idleRoot.runCmd(actionObj.beforeCommand);
             }
-            frameSettleTimer.pendingCallback = function() {
-                idleRoot.performLock();
-                if (actionObj.command && actionObj.command.trim().length > 0) {
-                    idleRoot.runCmd(actionObj.command);
-                }
-            };
-            frameSettleTimer.restart();
+            if (actionObj.command && actionObj.command.trim().length > 0) {
+                idleRoot.runCmd(actionObj.command);
+            }
+            idleRoot.performLock();
             return;
         }
 
@@ -296,7 +277,7 @@ Item {
 
         let id = (actionObj.id || "").toLowerCase();
         if (id === "dim") {
-            idleRoot.isDimmed = false;
+            return;
         } else if (id === "lock") {
             frameSettleTimer.stop();
             idleRoot.isLocked = false;
@@ -317,19 +298,21 @@ Item {
         }
     }
 
-    // Set by a manual trigger (mod+M / `idle trigger <name>`) so the watcher
-    // below can resume it on real activity. Actions reached via their own
-    // real timeout instead resume through the per-action IdleMonitor in the
+    // Filled by manual triggers (`idle trigger <name>`) so the watcher below
+    // can resume them on real activity. Actions reached via their own real
+    // timeout instead resume through the per-action IdleMonitor in the
     // Repeater below -- a manual trigger never makes that IdleMonitor go
     // idle, so without this, resumeAction() would never fire for it.
-    property var activeManualAction: null
+    // Several can be active at once (lock, then dpms), so this holds all of
+    // them: remembering only the latest would lose the earlier resumes.
+    property var activeManualActions: []
 
     function executeAction(name) {
         if (!name) return;
         let target = name.toString().trim().toLowerCase();
         let actionObj = idleRoot.allActions.find(a => (a.id && a.id.toLowerCase() === target) || (a.name && a.name.toLowerCase() === target));
         if (actionObj) {
-            idleRoot.activeManualAction = actionObj;
+            idleRoot.activeManualActions = idleRoot.activeManualActions.concat([actionObj]);
             idleRoot.triggerAction(actionObj);
         }
     }
@@ -344,13 +327,12 @@ Item {
     IdleMonitor {
         id: manualActivityWatcher
         timeout: 1
-        enabled: idleRoot.activeManualAction !== null
+        enabled: idleRoot.activeManualActions.length > 0
         onIsIdleChanged: {
-            if (!isIdle && idleRoot.activeManualAction) {
-                let act = idleRoot.activeManualAction;
-                idleRoot.activeManualAction = null;
-                idleRoot.resumeAction(act);
-            }
+            if (isIdle) return;
+            let acts = idleRoot.activeManualActions;
+            idleRoot.activeManualActions = [];
+            for (let i = acts.length - 1; i >= 0; i--) idleRoot.resumeAction(acts[i]);
         }
     }
 
