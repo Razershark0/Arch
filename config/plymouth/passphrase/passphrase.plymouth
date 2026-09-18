@@ -1,0 +1,10 @@
+[Plymouth Theme]
+Name=Passphrase
+Description=Black screen, "Passphrase?" and a blinking terminal-style cursor. Typed characters show as *
+ModuleName=script
+Font=JetBrains Mono Bold 28
+MonospaceFont=JetBrains Mono Bold 28
+
+[script]
+ImageDir=/usr/share/plymouth/themes/passphrase
+ScriptFile=/usr/share/plymouth/themes/passphrase/passphrase.script

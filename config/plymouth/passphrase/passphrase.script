@@ -1,0 +1,134 @@
+# Disk-unlock screen: black, the question "Passphrase?" (scrambles in from random
+# characters) and, under it, a blinking block cursor. Every typed character shows
+# as "*", and the stars plus cursor are kept centred as you type.
+# Nothing else is drawn, before or after the prompt.
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+font = "JetBrains Mono Bold 28";
+blink_ticks = 25;      # refreshes run at 50Hz, so the cursor flips twice a second
+
+white = Image("white.png");     # one white pixel, scaled to make the cursor
+
+# --- question ---------------------------------------------------------------------
+question = "Passphrase?";
+scramble_chars = "abcdefghijklmnopqrstuvwxyz0123456789#$%&*+=?/<>";
+scramble_len = scramble_chars.Length();
+scramble_step = 2;      # ticks between scramble flickers
+resolve_step = 5;       # ticks between each letter locking into place
+resolve_delay = 10;     # ticks of pure noise before the first letter locks
+
+title_image = Image.Text(question, 1, 1, 1, 1, font);
+star_image = Image.Text("*", 1, 1, 1, 1, font);
+star_w = star_image.GetWidth();
+star_h = star_image.GetHeight();
+
+gap = 20;
+row_h = star_h + 8;                 # height of the line the stars and cursor sit on
+stack_h = title_image.GetHeight() + gap + row_h;
+title_x = Math.Int((screen_w - title_image.GetWidth()) / 2);
+title_y = Math.Int((screen_h - stack_h) / 2);
+
+title = Sprite(title_image);
+title.SetPosition(title_x, title_y, 10);
+
+# --- typed characters and cursor ---------------------------------------------------
+# The cursor sits after the last "*"; stars and cursor together stay centred, so
+# the line grows outward from the middle as you type.
+cursor_w = star_w;          # full character cell, like a terminal block cursor
+cursor_h = star_h;
+text_y = title_y + title_image.GetHeight() + gap + 4;
+max_stars = Math.Int((screen_w - 80) / star_w) - 1;   # more than this stops growing
+
+stars = Sprite();
+cursor = Sprite(white.Scale(cursor_w, cursor_h));
+
+# --- behaviour --------------------------------------------------------------------------
+shown = 0;       # 1 while the prompt is on screen
+typed = 0;
+tick = 0;
+scramble_tick = 0;
+
+fun scramble_text() {
+    locked = Math.Int((scramble_tick - resolve_delay) / resolve_step);
+    if (scramble_tick < resolve_delay) locked = 0;
+    if (locked < 0) locked = 0;
+    text = "";
+    for (i = 0; i < question.Length(); i++) {
+        if (i < locked) text = text + question.CharAt(i);
+        else text = text + scramble_chars.CharAt(Math.Int(Math.Random() * scramble_len));
+    }
+    return text;
+}
+
+fun update_title() {
+    if (scramble_tick > resolve_delay + resolve_step * question.Length()) return;
+    if (scramble_tick % scramble_step != 0) return;
+    if (scramble_tick >= resolve_delay + resolve_step * (question.Length() - 1) + 1)
+        title.SetImage(title_image);
+    else
+        title.SetImage(Image.Text(scramble_text(), 1, 1, 1, 1, font));
+}
+
+fun show_prompt(on) {
+    shown = on;
+    op = 0;
+    if (on) {
+        op = 1;
+        scramble_tick = 0;
+        title.SetImage(Image.Text(scramble_text(), 1, 1, 1, 1, font));
+    }
+    title.SetOpacity(op);
+    if (!on) {
+        stars.SetOpacity(0);
+        cursor.SetOpacity(0);
+    }
+}
+
+fun draw() {
+    n = typed;
+    if (n > max_stars) n = max_stars;
+    text = "";
+    for (i = 0; i < n; i++) text = text + "*";
+    x0 = Math.Int((screen_w - (n + 1) * star_w) / 2);
+    if (n > 0) {
+        stars.SetImage(Image.Text(text, 1, 1, 1, 1, font));
+        stars.SetPosition(x0, text_y, 11);
+        stars.SetOpacity(1);
+    } else {
+        stars.SetOpacity(0);
+    }
+    cursor.SetPosition(x0 + n * star_w, text_y, 11);
+}
+
+fun password_callback(prompt, bullets) {
+    if (!shown) show_prompt(1);
+    typed = bullets;
+    tick = 0;                 # cursor is solid right after a key press
+    draw();
+}
+
+fun normal_callback() {
+    show_prompt(0);
+}
+
+fun refresh_callback() {
+    tick++;
+    if (shown) {
+        scramble_tick++;
+        update_title();
+    }
+    if (shown && Math.Int(tick / blink_ticks) % 2 == 0) cursor.SetOpacity(1);
+    else cursor.SetOpacity(0);
+}
+
+show_prompt(0);
+
+Plymouth.SetDisplayPasswordFunction(password_callback);
+Plymouth.SetDisplayQuestionFunction(fun(prompt, entry) { password_callback(prompt, 0); });
+Plymouth.SetDisplayNormalFunction(normal_callback);
+Plymouth.SetRefreshFunction(refresh_callback);

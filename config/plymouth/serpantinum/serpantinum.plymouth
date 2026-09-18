@@ -1,9 +1,0 @@
-[Plymouth Theme]
-Name=Serpantinum
-Description=Boot and disk-unlock screen that matches the Serpantinum lock screen
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/serpantinum
-ScriptFile=/usr/share/plymouth/themes/serpantinum/serpantinum.script
-Font=Iosevka Nerd Font 22

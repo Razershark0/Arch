@@ -60,18 +60,12 @@ echo "    instead of needing the full nerd-font variant for icon glyphs)..."
 sudo ln -sf /usr/share/fontconfig/conf.avail/10-nerd-font-symbols.conf /etc/fonts/conf.d/
 fc-cache -f
 
-echo "==> Boot: no GRUB menu, and a graphical disk-passphrase screen that matches"
-echo "    the lock screen (needs GRUB + a systemd initramfs, like the reference"
-echo "    machine; skipped otherwise)..."
+echo "==> Boot: no GRUB menu, and a plain black disk-passphrase screen (needs GRUB"
+echo "    + a systemd initramfs, like the reference machine; skipped otherwise)..."
 if [ -f /etc/default/grub ] && grep -q '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
-    # The theme, with your username in the greeting.
-    sudo rm -rf /usr/share/plymouth/themes/serpantinum
-    sudo mkdir -p /usr/share/plymouth/themes/serpantinum
-    sudo cp config/plymouth/serpantinum/*.png config/plymouth/serpantinum/serpantinum.plymouth \
-        /usr/share/plymouth/themes/serpantinum/
-    sed "s/@USER@/$USER/g" config/plymouth/serpantinum/serpantinum.script \
-        | sudo tee /usr/share/plymouth/themes/serpantinum/serpantinum.script >/dev/null
-    sudo plymouth-set-default-theme serpantinum
+    sudo mkdir -p /usr/share/plymouth/themes/passphrase
+    sudo cp config/plymouth/passphrase/* /usr/share/plymouth/themes/passphrase/
+    sudo plymouth-set-default-theme passphrase
 
     # Keep the current initramfs as a rescue image, and a GRUB entry for it, in
     # case the new one ever misbehaves (reach it with Esc during the 1 s GRUB wait).

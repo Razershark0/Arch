@@ -1,27 +1,21 @@
 # Boot / disk-unlock screen
 
-`serpantinum/` is a Plymouth theme that looks like the shell's lock screen: the
-dimmed wallpaper, a "Welcome <user>" box, and a passphrase field that shows one
-dot per typed character. It is what asks for the LUKS passphrase at boot.
+`passphrase/` is a tiny Plymouth theme (script module) that asks for the LUKS
+passphrase at boot: a black screen, the question "Passphrase?" (it scrambles in from
+random characters, about a second) and, under it, a blinking white block cursor (a full
+character cell, like a terminal's). Every typed character shows as `*`; the stars and
+cursor stay centred, growing outward from the middle. No box or other decoration.
+Nothing else is drawn, before or after the prompt.
 
-- `serpantinum.script` has an `@USER@` placeholder; `install.sh` fills in the
-  username when it installs the theme.
-- `background.png` is the wallpaper stretched to 1366x768 and darkened 75%
-  (the same darkening as the lock screen); the script scales it to the real
-  screen. `box.png`, `field.png` and `dot.png` are the box, input field and dot.
-- The font is Iosevka Nerd Font, which is why the fonts in `config/fonts` are
-  installed system-wide: the initramfs build runs as root and copies it in.
-
-`install.sh` also hides the GRUB menu (Esc during the 1 second wait brings it
-back), makes the boot quiet, and adds a rescue GRUB entry that boots the
-original initramfs (`/boot/initramfs-linux-backup.img`) with no splash, in case
-the new one ever misbehaves.
-
-To preview without rebooting, switch to a spare console (Ctrl+Alt+F2) and run
-as root, with the desktop's DISPLAY variables removed so Plymouth finds the GPU
-itself:
-
-    plymouthd --mode=boot --tty=tty2 --kernel-command-line="quiet splash"
-    plymouth show-splash
-    plymouth ask-for-password --prompt=test
-    plymouth quit
+- The font is JetBrains Mono Bold, set with `Font=`/`MonospaceFont=` in `passphrase.plymouth`
+  (the initramfs only carries the fonts named there; without them Plymouth bundles the
+  thin system default, FreeMono).
+- `passphrase.script` draws everything; `white.png` is one white pixel that the
+  script scales into the block cursor.
+- `install.sh` installs the theme, hides the GRUB menu (Esc during the 1 second
+  wait brings it back), makes the boot quiet, loads the Intel GPU driver early
+  and forces full backlight at the prompt, and adds a rescue GRUB entry that
+  boots the original initramfs (`/boot/initramfs-linux-backup.img`) with no
+  splash, in case the new one ever misbehaves.
+- Theme edits only take effect after `sudo plymouth-set-default-theme -R passphrase`
+  (that rebuilds the initramfs).
