@@ -42,7 +42,26 @@ get_locks() {
     echo "$caps $num"
 }
 
+WATCH_PIDFILE="$QS_RUN_DIR/kb_locks-watch.pid"
+
 watch_locks() {
+    mkdir -p "$QS_RUN_DIR" 2>/dev/null || true
+    # Singleton: a shell reload orphans the previous watcher (quickshell
+    # only tracks its direct child), so stop it before starting a new one.
+    # Matches either the pre-exec bash invocation or the post-exec python3
+    # it becomes (same PID, cmdline changes after exec) - see brightness.sh.
+    if [[ -f "$WATCH_PIDFILE" ]]; then
+        old_pid="$(cat "$WATCH_PIDFILE" 2>/dev/null || true)"
+        if [[ "$old_pid" =~ ^[0-9]+$ ]] && [[ "$old_pid" != "$$" ]]; then
+            if tr '\0' ' ' < "/proc/$old_pid/cmdline" 2>/dev/null | grep -qE "kb_locks\.sh|find_kbd_devices"; then
+                kill "$old_pid" 2>/dev/null || true
+                pkill -P "$old_pid" 2>/dev/null || true
+            fi
+        fi
+    fi
+    printf '%s\n' "$$" > "$WATCH_PIDFILE"
+    trap 'rm -f "$WATCH_PIDFILE"' EXIT
+
     if command -v python3 >/dev/null 2>&1; then
         exec python3 -u -c '
 import glob, os, select, struct, sys, time
