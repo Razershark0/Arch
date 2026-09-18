@@ -27,7 +27,14 @@ hl.bind(mainMod .. " + Up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + Down", hl.dsp.focus({ direction = "down" }))
 
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("hyprctl dispatch 'hl.dsp.window.float({ action = \"toggle\" })' && hyprctl dispatch 'hl.dsp.window.resize({ x = 900, y = 600 })' && hyprctl dispatch 'hl.dsp.window.center()'"))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("hyprctl dispatch 'hl.dsp.window.float({ action = \"on\" })' && hyprctl dispatch 'hl.dsp.window.resize({ x = 900, y = 600 })' && hyprctl dispatch 'hl.dsp.window.center()'"))
+hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+
+hl.bind(mainMod .. " + bracketright", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + bracketleft", hl.dsp.focus({ workspace = "e-1" }))
+
+hl.bind("F9", hl.dsp.exec_cmd("serpantinum msg toggle cheatsheet"))
+hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd("serpantinum msg toggle cheatsheet"))
 
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("serpantinum brightness lower"), { locked = true })
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("serpantinum brightness raise"), { locked = true })
