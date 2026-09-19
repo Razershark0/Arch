@@ -357,6 +357,7 @@ PanelWindow {
     FileView {
         id: audioPrefsFile
         path: Caching.getStateDir("screenshot") + "/audio_prefs"
+        printErrors: false
 
         onLoaded: (data) => {
             let content = data.trim();

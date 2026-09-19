@@ -57,28 +57,8 @@ PanelWindow {
     }
 
     Connections {
-        target: (typeof I18n !== "undefined") ? I18n : null
-        function onLanguageChanged() {
-            if (launcherWindow.isVisible) {
-                launcherWindow.loadApps();
-                launcherWindow.executeFilter(searchInput.text);
-            } else {
-                launcherWindow.appsLoaded = false;
-            }
-        }
-    }
-
-    Connections {
         target: (typeof DesktopEntries !== "undefined" && DesktopEntries.applications) ? DesktopEntries.applications : null
         function onValuesChanged() {
-            if (launcherWindow.isVisible) {
-                launcherWindow.loadApps();
-                launcherWindow.executeFilter(searchInput.text);
-            } else {
-                launcherWindow.appsLoaded = false;
-            }
-        }
-        function onCountChanged() {
             if (launcherWindow.isVisible) {
                 launcherWindow.loadApps();
                 launcherWindow.executeFilter(searchInput.text);

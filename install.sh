@@ -7,7 +7,7 @@
 set -e
 
 echo "==> Installing official packages..."
-sudo pacman -S --needed --noconfirm - < packages.txt
+sudo pacman -Syu --needed --noconfirm - < packages.txt
 
 echo "==> Bootstrapping yay (AUR helper)..."
 if ! command -v yay &> /dev/null; then

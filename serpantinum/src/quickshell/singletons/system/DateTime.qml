@@ -65,15 +65,15 @@ Item {
         return (pattern && pattern !== "datetime.full_date") ? pattern : "dddd, MMMM dd";
     }
 
-    readonly property string fullDate: now.toLocaleDateString(Qt.locale(I18n.currentLang), fullDatePattern)
-    readonly property string shortDate: now.toLocaleDateString(Qt.locale(I18n.currentLang), "d MMM")
-    readonly property string dateBadge: now.toLocaleDateString(Qt.locale(I18n.currentLang), "d MMM").toUpperCase()
+    readonly property string fullDate: now.toLocaleDateString(Qt.locale(), fullDatePattern)
+    readonly property string shortDate: now.toLocaleDateString(Qt.locale(), "d MMM")
+    readonly property string dateBadge: now.toLocaleDateString(Qt.locale(), "d MMM").toUpperCase()
     readonly property string day: Qt.formatDateTime(now, "dd")
     readonly property string dayShort: Qt.formatDateTime(now, "d")
-    readonly property string dayName: now.toLocaleDateString(Qt.locale(I18n.currentLang), "dddd")
-    readonly property string dayNameShort: now.toLocaleDateString(Qt.locale(I18n.currentLang), "ddd")
-    readonly property string month: now.toLocaleDateString(Qt.locale(I18n.currentLang), "MMMM")
-    readonly property string monthShort: now.toLocaleDateString(Qt.locale(I18n.currentLang), "MMM")
+    readonly property string dayName: now.toLocaleDateString(Qt.locale(), "dddd")
+    readonly property string dayNameShort: now.toLocaleDateString(Qt.locale(), "ddd")
+    readonly property string month: now.toLocaleDateString(Qt.locale(), "MMMM")
+    readonly property string monthShort: now.toLocaleDateString(Qt.locale(), "MMM")
     readonly property string year: Qt.formatDateTime(now, "yyyy")
 
     function format(pattern, dateObj) {
