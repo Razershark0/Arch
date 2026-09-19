@@ -67,9 +67,14 @@ if [ -f /etc/default/grub ] && grep -q '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.co
     sudo cp config/plymouth/passphrase/* /usr/share/plymouth/themes/passphrase/
     sudo plymouth-set-default-theme passphrase
 
-    # Keep the current initramfs as a rescue image, and a GRUB entry for it, in
-    # case the new one ever misbehaves (reach it with Esc during the 1 s GRUB wait).
-    [ -f /boot/initramfs-linux-backup.img ] || sudo cp /boot/initramfs-linux.img /boot/initramfs-linux-backup.img
+    # Keep a plain (no splash, no early GPU) initramfs as a rescue image, and a
+    # GRUB entry for it, in case the new one ever misbehaves (reach it with Esc
+    # during the 1 s GRUB wait). A pacman hook rebuilds it whenever the kernel
+    # updates, so its modules always match the installed kernel; run the hook's
+    # command once now for the first copy.
+    sudo mkdir -p /etc/pacman.d/hooks
+    sudo cp config/pacman/99-rescue-initramfs.hook /etc/pacman.d/hooks/
+    sudo sh -c "$(sed -n 's/^Exec = //p' config/pacman/99-rescue-initramfs.hook)"
     if ! grep -q 'rescue: original initramfs' /etc/grub.d/40_custom; then
         sudo tee -a /etc/grub.d/40_custom >/dev/null << EOF
 

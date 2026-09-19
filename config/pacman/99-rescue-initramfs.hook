@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = mkinitcpio
+
+[Action]
+Description = Rebuilding the rescue initramfs (plain, no splash) for the GRUB rescue entry...
+When = PostTransaction
+Exec = /usr/bin/sh -c 'sed -E "/^HOOKS=/s/ plymouth//" /etc/mkinitcpio.conf > /run/rescue-mkinitcpio.conf && mkinitcpio -c /run/rescue-mkinitcpio.conf -k /boot/vmlinuz-linux -g /boot/initramfs-linux-backup.img.new && mv /boot/initramfs-linux-backup.img.new /boot/initramfs-linux-backup.img'
